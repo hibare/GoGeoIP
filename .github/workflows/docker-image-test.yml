@@ -1,0 +1,70 @@
+name: Docker build test
+
+# When its time to do a release do a full cross platform build for all supported
+# architectures and push all of them to Docker Hub & Github container registry.
+# Only trigger on semver shaped tags.
+on:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches:
+      - "main"
+    paths-ignore:
+      - "**/README.md"
+      - "**/.github"
+
+jobs:
+  docker-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            hibare/moni
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}

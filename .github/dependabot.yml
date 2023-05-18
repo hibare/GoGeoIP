@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "dev"
+    assignees:
+      - "hibare"
+
+  # Maintain dependencies for Go mods
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "dev"
+    assignees:
+      - "hibare"
+
+  # Maintain version for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "dev"
+    assignees:
+      - "hibare"
