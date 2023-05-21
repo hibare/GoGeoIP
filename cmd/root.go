@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/hibare/GoGeoIP/cmd/api"
+	"github.com/hibare/GoGeoIP/cmd/api/keys"
 	"github.com/hibare/GoGeoIP/cmd/db"
 	"github.com/hibare/GoGeoIP/cmd/geoip"
 	"github.com/hibare/GoGeoIP/internal/config"
@@ -15,7 +16,7 @@ import (
 var Version = "0.0.0"
 
 var rootCmd = &cobra.Command{
-	Use:     "GoGeoIP",
+	Use:     "go_geo_ip",
 	Short:   "API to fetch Geo information for an IP",
 	Long:    "",
 	Version: Version,
@@ -37,6 +38,7 @@ func init() {
 	rootCmd.AddCommand(db.DBCmd)
 	rootCmd.AddCommand(geoip.GeoIPCmd)
 	rootCmd.AddCommand(api.ServeCmd)
+	rootCmd.AddCommand(keys.KeysCmd)
 
 	config.Load()
 

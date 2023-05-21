@@ -134,6 +134,61 @@ docker compose up
 }
 ```
 
+## Cli
+
+GoGeoIP also has cli commands for quick actions. Binary is `go_geo_ip`.
+
+For docker containers prefix all commands with `docker exec -it {container_name}`
+
+```shell
+go_geo_ip -h
+```
+
+```
+API to fetch Geo information for an IP
+
+Usage:
+  go_geo_ip [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  db          IP DB related commands
+  geoip       Lookup Geo information for an IP
+  help        Help about any command
+  keys        Manage API Keys
+  serve       Start API Server
+
+Flags:
+  -h, --help      help for go_geo_ip
+  -v, --version   version for go_geo_ip
+
+Use "go_geo_ip [command] --help" for more information about a command.
+```
+
+## Start API Server
+
+```shell
+go_geo_ip serve
+```
+
+## Download DB
+
+```shell
+go_geo_ip db download
+```
+
+## List API Keys
+
+```shell
+go_geo_ip keys list
+```
+
+## Version
+
+```shell
+go_geo_ip --version
+```
+
 ## Environment Variables
 
 | Variable               | Description                                          | Required | Default Value                 | Value Type                      |
