@@ -16,14 +16,7 @@ api-down:
 	${DOCKER_COMPOSE_PREFIX} rm -fsv api
 
 test:
-	if [ ! -f ${GODOTENV_CMD_PATH} ]; then \
-		echo "Missing godotenv cmd"; \
-		echo "Installing..."; \
-		go install github.com/joho/godotenv/cmd/godotenv@latest; \
-		echo "Installed"; \
-	fi
-	
-	${GODOTENV_CMD_PATH} -f .env go test ./... -cover
+	go test ./... -cover
 
 clean: 
 	${DOCKER_COMPOSE_PREFIX} down
