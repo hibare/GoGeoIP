@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/maxmind"
