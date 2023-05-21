@@ -16,7 +16,7 @@ import (
 var Version = "0.0.0"
 
 var rootCmd = &cobra.Command{
-	Use:     "GoGeoIP",
+	Use:     "go_geo_ip",
 	Short:   "API to fetch Geo information for an IP",
 	Long:    "",
 	Version: Version,
