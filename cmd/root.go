@@ -38,6 +38,9 @@ func init() {
 	rootCmd.AddCommand(geoip.GeoIPCmd)
 	rootCmd.AddCommand(api.ServeCmd)
 
-	// cobra.OnInitialize(config.Load, maxmind.DownloadAll)
-	cobra.OnInitialize(config.Load, ScheduleBackgroundJobs)
+	initFuncs := []func(){
+		config.Load,
+		ScheduleBackgroundJobs,
+	}
+	cobra.OnInitialize(initFuncs...)
 }
