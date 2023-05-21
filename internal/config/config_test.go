@@ -19,6 +19,7 @@ const (
 	testAPIListenAddr        = "127.0.0.1"
 	testAPIListenPort        = 10000
 	testAPIKeys              = "test-api-key"
+	testIsDev                = true
 )
 
 func TestEnvLoadedConfig(t *testing.T) {
@@ -29,6 +30,7 @@ func TestEnvLoadedConfig(t *testing.T) {
 	os.Setenv("API_LISTEN_ADDR", testAPIListenAddr)
 	os.Setenv("API_LISTEN_PORT", strconv.Itoa(testAPIListenPort))
 	os.Setenv("API_KEYS", testAPIKeys)
+	os.Setenv("IS_DEV", strconv.FormatBool(testIsDev))
 
 	Load()
 	defer os.RemoveAll(constants.AssetDir)
@@ -39,6 +41,7 @@ func TestEnvLoadedConfig(t *testing.T) {
 	assert.Equal(t, testDBLicenseKey, Current.DB.LicenseKey)
 	assert.Equal(t, testDBAutoUpdate, Current.DB.AutoUpdate)
 	assert.Equal(t, testDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
+	assert.Equal(t, testIsDev, Current.Util.IsDev)
 
 	// Check asset dir
 	_, err := os.Stat(Current.Util.AssetDirPath)
@@ -52,6 +55,7 @@ func TestEnvLoadedConfig(t *testing.T) {
 	os.Unsetenv("API_LISTEN_ADDR")
 	os.Unsetenv("API_LISTEN_PORT")
 	os.Unsetenv("API_KEYS")
+	os.Unsetenv("IS_DEV")
 
 }
 
@@ -62,6 +66,7 @@ func TestDefaultConfig(t *testing.T) {
 	os.Unsetenv("API_LISTEN_ADDR")
 	os.Unsetenv("API_LISTEN_PORT")
 	os.Unsetenv("API_KEYS")
+	os.Unsetenv("IS_DEV")
 
 	os.Setenv("DB_LICENSE_KEY", testDBLicenseKey)
 
@@ -74,6 +79,7 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Len(t, Current.API.APIKeys, 1)
 	assert.True(t, true, Current.DB.AutoUpdate)
 	assert.Equal(t, constants.DefaultDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
+	assert.Equal(t, false, Current.Util.IsDev)
 
 	os.Unsetenv("DB_LICENSE_KEY")
 }
@@ -85,6 +91,7 @@ func TestDefaultConfigFail(t *testing.T) {
 	os.Unsetenv("API_LISTEN_ADDR")
 	os.Unsetenv("API_LISTEN_PORT")
 	os.Unsetenv("API_KEYS")
+	os.Unsetenv("IS_DEV")
 
 	defer func() { log.StandardLogger().ExitFunc = nil }()
 	var fatal bool

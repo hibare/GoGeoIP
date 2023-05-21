@@ -14,6 +14,7 @@ import (
 
 type UtilConfig struct {
 	AssetDirPath string
+	IsDev        bool
 }
 
 type DBConfig struct {
@@ -62,6 +63,7 @@ func Load() {
 		},
 		Util: UtilConfig{
 			AssetDirPath: assetDir,
+			IsDev:        env.MustBool("IS_DEV", false),
 		},
 	}
 
