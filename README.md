@@ -113,7 +113,7 @@ docker compose up
    `[GET]` `/api/v1/ip/{lookup_ip}`
 
 ```shell
-❯ curl -H "Authorization: test-key" http://127.0.0.1:5000/api/v1/ip/106.213.87.64
+❯ curl -H "Authorization: test-key" http://127.0.0.1:5000/api/v1/ip/8.8.8.8
 ```
 
 ```json
@@ -141,7 +141,7 @@ GoGeoIP also has cli commands for quick actions. Binary is `go_geo_ip`.
 For docker containers prefix all commands with `docker exec -it {container_name}`
 
 ```shell
-go_geo_ip -h
+❯ go_geo_ip -h
 ```
 
 ```
@@ -168,25 +168,25 @@ Use "go_geo_ip [command] --help" for more information about a command.
 ## Start API Server
 
 ```shell
-go_geo_ip serve
+❯ go_geo_ip serve
 ```
 
 ## Download DB
 
 ```shell
-go_geo_ip db download
+❯ go_geo_ip db download
 ```
 
 ## List API Keys
 
 ```shell
-go_geo_ip keys list
+❯ go_geo_ip keys list
 ```
 
 ## Version
 
 ```shell
-go_geo_ip --version
+❯ go_geo_ip --version
 ```
 
 ## Environment Variables
