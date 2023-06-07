@@ -2,9 +2,9 @@ package keys
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/skip2/go-qrcode"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +16,14 @@ var ListKeysCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("\nAvaialable API Keys")
 		fmt.Println("--------------------")
-		fmt.Println(strings.Join(config.Current.API.APIKeys, "\n"))
+
+		for _, apikey := range config.Current.API.APIKeys {
+			qrCode, err := qrcode.New(apikey, qrcode.Medium)
+			if err != nil {
+				fmt.Printf("Error: %s\n", err)
+				continue
+			}
+			fmt.Println(qrCode.ToString(false))
+		}
 	},
 }
