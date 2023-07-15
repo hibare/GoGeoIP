@@ -7,7 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
+	commonErrors "github.com/hibare/GoCommon/pkg/errors"
+	commonHttp "github.com/hibare/GoCommon/pkg/http"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/maxmind"
 )
@@ -20,15 +21,11 @@ func GeoIP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Errorf("Error fetching record for ip %s, %s", ip, err)
 		if errors.Is(err, constants.ErrInvalidIP) {
-			render.Status(r, http.StatusBadRequest)
+			commonHttp.WriteErrorResponse(w, http.StatusBadRequest, err)
 		} else {
-			render.Status(r, http.StatusInternalServerError)
+			commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, commonErrors.ErrInternalServerError)
 		}
-		render.JSON(w, r, ErrorStruct{
-			Message: err.Error(),
-		})
 		return
 	}
-
-	render.JSON(w, r, ipGeo)
+	commonHttp.WriteJsonResponse(w, http.StatusOK, ipGeo)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hibare/GoCommon/pkg/env"
 	"github.com/hibare/GoGeoIP/internal/constants"
-	"github.com/hibare/GoGeoIP/internal/env"
 )
 
 type UtilConfig struct {

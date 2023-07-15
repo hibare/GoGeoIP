@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hibare/GoGeoIP/internal/api/handler"
-	"github.com/hibare/GoGeoIP/internal/api/middlewares"
+	"github.com/hibare/GoCommon/pkg/errors"
+	commonMiddleware "github.com/hibare/GoCommon/pkg/http/middleware"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/testhelper"
@@ -28,62 +28,24 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestHealthCheckHandler(t *testing.T) {
-	testCases := []struct {
-		Name string
-		URL  string
-	}{
-		{
-			Name: "URL without trailing slash",
-			URL:  "/api/v1/health",
-		}, {
-			Name: "URL with trailing slash",
-			URL:  "/api/v1/health/",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
-			r, err := http.NewRequest("GET", tc.URL, nil)
-
-			assert.NoError(t, err)
-
-			w := httptest.NewRecorder()
-
-			app.Router.ServeHTTP(w, r)
-
-			assert.Equal(t, http.StatusOK, w.Code)
-
-			expectedBody := map[string]bool{"ok": true}
-			responseBody := map[string]bool{}
-
-			err = json.NewDecoder(w.Body).Decode(&responseBody)
-
-			assert.NoError(t, err)
-
-			if assert.NotNil(t, responseBody) {
-				assert.Equal(t, responseBody, expectedBody)
-			}
-		})
-	}
-}
-
 func TestGeoIP400(t *testing.T) {
 	testCases := []struct {
 		Name         string
 		URL          string
-		expectedBody handler.ErrorStruct
+		expectedBody errors.Error
 	}{
 		{
 			Name: "URL without trailing slash",
 			URL:  "/api/v1/ip/8.8.8",
-			expectedBody: handler.ErrorStruct{
+			expectedBody: errors.Error{
+				Code:    http.StatusBadRequest,
 				Message: constants.ErrInvalidIP.Error(),
 			},
 		}, {
 			Name: "URL with trailing slash",
 			URL:  "/api/v1/ip/8.8.8/",
-			expectedBody: handler.ErrorStruct{
+			expectedBody: errors.Error{
+				Code:    http.StatusBadRequest,
 				Message: constants.ErrInvalidIP.Error(),
 			},
 		},
@@ -94,7 +56,7 @@ func TestGeoIP400(t *testing.T) {
 			r, err := http.NewRequest("GET", tc.URL, nil)
 			assert.NoError(t, err)
 
-			r.Header.Add(middlewares.AuthHeaderName, config.Current.API.APIKeys[0])
+			r.Header.Add(commonMiddleware.AuthHeaderName, config.Current.API.APIKeys[0])
 
 			w := httptest.NewRecorder()
 
@@ -102,7 +64,7 @@ func TestGeoIP400(t *testing.T) {
 
 			assert.Equal(t, http.StatusBadRequest, w.Code)
 
-			responseBody := handler.ErrorStruct{}
+			responseBody := errors.Error{}
 			err = json.NewDecoder(w.Body).Decode(&responseBody)
 			assert.NoError(t, err)
 
@@ -118,19 +80,21 @@ func TestGeoIP401(t *testing.T) {
 	testCases := []struct {
 		Name         string
 		URL          string
-		expectedBody handler.ErrorStruct
+		expectedBody errors.Error
 	}{
 		{
 			Name: "URL without trailing slash",
 			URL:  "/api/v1/ip",
-			expectedBody: handler.ErrorStruct{
-				Message: constants.ErrUnauthorized.Error(),
+			expectedBody: errors.Error{
+				Code:    http.StatusUnauthorized,
+				Message: errors.ErrUnauthorized.Error(),
 			},
 		}, {
 			Name: "URL with trailing slash",
 			URL:  "/api/v1/ip/",
-			expectedBody: handler.ErrorStruct{
-				Message: constants.ErrUnauthorized.Error(),
+			expectedBody: errors.Error{
+				Code:    http.StatusUnauthorized,
+				Message: errors.ErrUnauthorized.Error(),
 			},
 		},
 	}
@@ -146,7 +110,7 @@ func TestGeoIP401(t *testing.T) {
 
 			assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-			responseBody := handler.ErrorStruct{}
+			responseBody := errors.Error{}
 			err = json.NewDecoder(w.Body).Decode(&responseBody)
 			assert.NoError(t, err)
 
@@ -177,7 +141,7 @@ func TestGeoIP404(t *testing.T) {
 			r, err := http.NewRequest("GET", tc.URL, nil)
 			assert.NoError(t, err)
 
-			r.Header.Add(middlewares.AuthHeaderName, config.Current.API.APIKeys[0])
+			r.Header.Add(commonMiddleware.AuthHeaderName, config.Current.API.APIKeys[0])
 
 			w := httptest.NewRecorder()
 
@@ -209,7 +173,7 @@ func TestGeoIP500(t *testing.T) {
 			r, err := http.NewRequest("GET", tc.URL, nil)
 			assert.NoError(t, err)
 
-			r.Header.Add(middlewares.AuthHeaderName, config.Current.API.APIKeys[0])
+			r.Header.Add(commonMiddleware.AuthHeaderName, config.Current.API.APIKeys[0])
 
 			w := httptest.NewRecorder()
 
@@ -246,7 +210,7 @@ func TestGeoIP200(t *testing.T) {
 			r, err := http.NewRequest("GET", tc.URL, nil)
 			assert.NoError(t, err)
 
-			r.Header.Add(middlewares.AuthHeaderName, config.Current.API.APIKeys[0])
+			r.Header.Add(commonMiddleware.AuthHeaderName, config.Current.API.APIKeys[0])
 
 			w := httptest.NewRecorder()
 
