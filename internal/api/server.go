@@ -13,8 +13,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
+	commonHandler "github.com/hibare/GoCommon/pkg/http/handler"
+	commonMiddleware "github.com/hibare/GoCommon/pkg/http/middleware"
 	"github.com/hibare/GoGeoIP/internal/api/handler"
-	"github.com/hibare/GoGeoIP/internal/api/middlewares"
 	"github.com/hibare/GoGeoIP/internal/config"
 )
 
@@ -32,7 +33,9 @@ func (a *App) setRouters() {
 func (a *App) Get(path string, f func(w http.ResponseWriter, r *http.Request), protected bool) {
 	if protected {
 		pr := chi.NewRouter()
-		pr.Use(middlewares.TokenAuth)
+		pr.Use(func(h http.Handler) http.Handler {
+			return commonMiddleware.TokenAuth(h, config.Current.API.APIKeys)
+		})
 		pr.Get(path, f)
 		a.Router.Mount("/", pr)
 	} else {
@@ -56,7 +59,7 @@ func (a *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)
 }
 
 func (a *App) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	handler.HealthCheck(w, r)
+	commonHandler.HealthCheck(w, r)
 }
 
 func (a *App) GeoIP(w http.ResponseWriter, r *http.Request) {
