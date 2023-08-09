@@ -26,6 +26,7 @@ type App struct {
 
 func (a *App) setRouters() {
 	a.Get("/api/v1/health", a.HealthCheck, false)
+	a.Get("/api/v1/ip", a.MyIP, false)
 	a.Get("/api/v1/ip/{ip}", a.GeoIP, true)
 }
 
@@ -64,6 +65,10 @@ func (a *App) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) GeoIP(w http.ResponseWriter, r *http.Request) {
 	handler.GeoIP(w, r)
+}
+
+func (a *App) MyIP(w http.ResponseWriter, r *http.Request) {
+	handler.MyIP(w, r)
 }
 
 // App initialize with predefined configuration

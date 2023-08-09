@@ -15,8 +15,7 @@ const (
 )
 
 var (
-	ErrChecksumMismatch = errors.New("checksum Mismatch")
-	ErrInvalidIP        = errors.New("invalid IP")
+	ErrInvalidIP = errors.New("invalid IP")
 )
 
 const (

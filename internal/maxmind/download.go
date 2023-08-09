@@ -9,9 +9,9 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hibare/GoCommon/pkg/file"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
-	file "github.com/hibare/GoGeoIP/internal/utils"
 )
 
 var getDBUrl = func(dbType string) string {
@@ -35,8 +35,7 @@ func GetDBFilePath(dbType string) string {
 }
 
 func parseSHA256File(path string) (string, string, error) {
-
-	content, err := file.ReadFile(path)
+	content, err := file.ReadFileLines(path)
 	if err != nil {
 		return "", "", err
 	}
