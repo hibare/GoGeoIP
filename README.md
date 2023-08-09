@@ -116,6 +116,13 @@ docker compose up
 ❯ curl -H "Authorization: test-key" http://127.0.0.1:5000/api/v1/ip/8.8.8.8
 ```
 
+3. What is My IP
+   `[GET]` `/api/v1/ip/`
+
+```shell
+❯ curl -H http://127.0.0.1:5000/api/v1/ip/
+```
+
 ```json
 {
   "city": {
