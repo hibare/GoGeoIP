@@ -8,6 +8,7 @@ import (
 )
 
 type IPCountry struct {
+	IP                  string `json:"ip"`
 	Country             string `json:"country"`
 	Continent           string `json:"continent"`
 	ISOCountryCode      string `json:"iso_country_code"`
@@ -17,6 +18,7 @@ type IPCountry struct {
 }
 
 type IPCity struct {
+	IP   string `json:"ip"`
 	City string `json:"city"`
 	IPCountry
 	Timezone  string  `json:"timezone"`
@@ -25,6 +27,7 @@ type IPCity struct {
 }
 
 type IPASN struct {
+	IP           string `json:"ip"`
 	ASN          uint   `json:"asn"`
 	Organization string `json:"oraganization"`
 }
@@ -32,6 +35,8 @@ type IPASN struct {
 type GeoIP struct {
 	IPCity `json:"city"`
 	IPASN  `json:"asn"`
+	IP     string `json:"ip"`
+	Remark string `json:"remark,omitempty"`
 }
 
 func IP2Country(ip string) (IPCountry, error) {
@@ -53,6 +58,7 @@ func IP2Country(ip string) (IPCountry, error) {
 		return ipCountry, err
 	}
 
+	ipCountry.IP = ip
 	ipCountry.Continent = record.Continent.Names["en"]
 	ipCountry.Country = record.Country.Names["en"]
 	ipCountry.ISOContinentCode = record.Continent.Code
@@ -82,6 +88,7 @@ func IP2City(ip string) (IPCity, error) {
 		return ipCity, err
 	}
 
+	ipCity.IP = ip
 	ipCity.City = record.City.Names["en"]
 	ipCity.Timezone = record.Location.TimeZone
 	ipCity.Latitude = record.Location.Latitude
@@ -115,6 +122,7 @@ func IP2ASN(ip string) (IPASN, error) {
 		return ipAsn, err
 	}
 
+	ipAsn.IP = ip
 	ipAsn.ASN = record.AutonomousSystemNumber
 	ipAsn.Organization = record.AutonomousSystemOrganization
 
@@ -122,7 +130,9 @@ func IP2ASN(ip string) (IPASN, error) {
 }
 
 func IP2Geo(ip string) (GeoIP, error) {
-	geoIP := GeoIP{}
+	geoIP := GeoIP{
+		IP: ip,
+	}
 
 	ipCity, err := IP2City(ip)
 	if err != nil {
@@ -134,7 +144,8 @@ func IP2Geo(ip string) (GeoIP, error) {
 		return geoIP, err
 	}
 
-	geoIP = GeoIP{ipCity, ipAsn}
+	geoIP.IPCity = ipCity
+	geoIP.IPASN = ipAsn
 
 	return geoIP, nil
 }

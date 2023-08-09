@@ -29,6 +29,7 @@ func TestIP2Geo(t *testing.T) {
 				Name: "IPv4 Success",
 				IP:   "81.2.69.160",
 				Expected: IPCountry{
+					IP:                  "81.2.69.160",
 					Country:             "United Kingdom",
 					Continent:           "Europe",
 					ISOCountryCode:      "GB",
@@ -72,6 +73,7 @@ func TestIP2Geo(t *testing.T) {
 				Name: "IPv4 Success",
 				IP:   "81.2.69.160",
 				Expected: IPCity{
+					IP:   "81.2.69.160",
 					City: "London",
 					IPCountry: IPCountry{
 						Country:             "United Kingdom",
@@ -122,6 +124,7 @@ func TestIP2Geo(t *testing.T) {
 				Name: "IPv4 Success",
 				IP:   "149.101.100.0",
 				Expected: IPASN{
+					IP:           "149.101.100.0",
 					ASN:          6167,
 					Organization: "CELLCO-PART",
 				},
@@ -161,7 +164,9 @@ func TestIP2Geo(t *testing.T) {
 				Name: "IPv4 Success",
 				IP:   "149.101.100.0",
 				Expected: GeoIP{
+					IP: "149.101.100.0",
 					IPCity: IPCity{
+						IP:   "149.101.100.0",
 						City: "",
 						IPCountry: IPCountry{
 							Country:             "United States",
@@ -176,6 +181,7 @@ func TestIP2Geo(t *testing.T) {
 						Longitude: -97.822,
 					},
 					IPASN: IPASN{
+						IP:           "149.101.100.0",
 						ASN:          6167,
 						Organization: "CELLCO-PART",
 					},
@@ -185,7 +191,7 @@ func TestIP2Geo(t *testing.T) {
 			{
 				Name:        "IPv4 Error",
 				IP:          "149.101.100.",
-				Expected:    GeoIP{},
+				Expected:    GeoIP{IP: "149.101.100."},
 				ExpectedErr: constants.ErrInvalidIP,
 			},
 		}
@@ -196,7 +202,7 @@ func TestIP2Geo(t *testing.T) {
 				if tc.ExpectedErr != nil {
 					assert.Error(t, err)
 					assert.ErrorIs(t, err, tc.ExpectedErr)
-					assert.Empty(t, ipGeo)
+					assert.Equal(t, tc.Expected, ipGeo)
 				} else {
 					assert.NoError(t, err)
 					assert.Equal(t, tc.Expected, ipGeo)
