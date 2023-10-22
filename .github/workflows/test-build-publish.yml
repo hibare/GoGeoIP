@@ -1,4 +1,4 @@
-name: Publish docker image
+name: Test, Dev Build & Release Publish
 
 # When its time to do a release do a full cross platform build for all supported
 # architectures and push all of them to Docker Hub and GitHub Container Registry.
@@ -7,9 +7,19 @@ on:
   push:
     tags:
       - "*"
+    branches:
+      - dev
+
+  pull_request:
+    branches:
+      - "main"
+      - "dev"
+    paths-ignore:
+      - "**/README.md"
+      - "**/.github"
 
 jobs:
-  dockerhub-publish:
+  docker-image-test-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,23 +28,43 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.20.4"
+          go-version-file: go.mod
 
-      - name: GO Test
+      - name: Go Test
         run: make test
+
+      - name: Set Docker Tags
+        id: set-docker-tags
+        run: |
+          DOCKER_TAGS="unknown"
+
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            DOCKER_TAGS="dev"
+          else
+            DOCKER_TAGS="type=semver,pattern={{version}} type=semver,pattern={{major}}"
+          fi
+
+          echo "::set-output name=docker_tags::$DOCKER_TAGS"
+        shell: bash
+
+      - name: Set Docker Image Names
+        id: set-docker-image-names
+        run: |
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+            IMAGE_NAMES="hibare/go-geo-ip"
+          else
+            IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
+          fi
+
+          echo "::set-output name=docker_image_names::$IMAGE_NAMES"
+        shell: bash
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # list of Docker images to use as base name for tags
-          images: |
-            hibare/go-geo-ip
-            ghcr.io/hibare/go-geo-ip
-          # generate Docker tags based on the following events/attributes
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}
+          images: ${{ steps.set-docker-image-names.outputs.docker_image_names}}
+          tags: ${{ steps.set-docker-tags.outputs.docker_tags }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -61,6 +91,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -77,8 +108,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          build-args: |
-            GIT_VERSION_TAG=${{ env.RELEASE_VERSION }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
