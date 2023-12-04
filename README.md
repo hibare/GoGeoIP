@@ -125,19 +125,19 @@ docker compose up
 
 ```json
 {
-  "city": {
-    "city": "Los Angeles",
-    "country": "United States",
-    "continent": "North America",
-    "iso_country_code": "US",
-    "iso_continent_code": "NA",
-    "is_anonymous_proxy": false,
-    "is_satellite_provider": false,
-    "timezone": "America/Los_Angeles",
-    "latitude": 34.0544,
-    "longitude": -118.2441
-  },
-  "asn": { "asn": 15169, "oraganization": "GOOGLE" }
+  "city": "",
+  "country": "United States",
+  "continent": "North America",
+  "iso_country_code": "US",
+  "iso_continent_code": "NA",
+  "is_anonymous_proxy": false,
+  "is_satellite_provider": false,
+  "timezone": "America/Chicago",
+  "latitude": 37.751,
+  "longitude": -97.822,
+  "asn": 15169,
+  "oraganization": "GOOGLE",
+  "ip": "8.8.8.8"
 }
 ```
 

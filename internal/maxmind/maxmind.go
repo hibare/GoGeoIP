@@ -33,8 +33,8 @@ type IPASN struct {
 }
 
 type GeoIP struct {
-	IPCity `json:"city"`
-	IPASN  `json:"asn"`
+	IPCity
+	IPASN
 	IP     string `json:"ip"`
 	Remark string `json:"remark,omitempty"`
 }
