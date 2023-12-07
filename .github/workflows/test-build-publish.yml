@@ -41,7 +41,7 @@ jobs:
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
             DOCKER_TAGS="dev"
           else
-            DOCKER_TAGS="type=semver,pattern={{version}} type=semver,pattern={{major}}"
+            DOCKER_TAGS="type=semver,pattern={{version}},type=semver,pattern={{major}}"
           fi
 
           echo "::set-output name=docker_tags::$DOCKER_TAGS"
@@ -53,7 +53,7 @@ jobs:
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
             IMAGE_NAMES="hibare/go-geo-ip"
           else
-            IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
+            IMAGE_NAMES="hibare/go-geo-ip,ghcr.io/hibare/go-geo-ip"
           fi
 
           echo "::set-output name=docker_image_names::$IMAGE_NAMES"
