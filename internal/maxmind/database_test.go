@@ -54,10 +54,6 @@ func TestGetDB(t *testing.T) {
 		os.RemoveAll(constants.AssetDir)
 	})
 
-	dbCountryReader = nil
-	dbCityReader = nil
-	dbAsnReader = nil
-
 	countryDB := GetDB(constants.DBTypeCountry)
 	assert.NotNil(t, countryDB)
 
