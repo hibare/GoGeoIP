@@ -4,7 +4,6 @@ import (
 	"net"
 
 	"github.com/hibare/GoGeoIP/internal/constants"
-	"github.com/oschwald/geoip2-golang"
 )
 
 type IPCountry struct {
@@ -47,13 +46,7 @@ func IP2Country(ip string) (IPCountry, error) {
 		return ipCountry, constants.ErrInvalidIP
 	}
 
-	db, err := geoip2.Open(GetDBFilePath(constants.DBTypeCountry))
-	if err != nil {
-		return ipCountry, err
-	}
-	defer db.Close()
-
-	record, err := db.Country(parsedIP)
+	record, err := GetDB(constants.DBTypeCountry).Country(parsedIP)
 	if err != nil {
 		return ipCountry, err
 	}
@@ -77,13 +70,7 @@ func IP2City(ip string) (IPCity, error) {
 		return ipCity, constants.ErrInvalidIP
 	}
 
-	db, err := geoip2.Open(GetDBFilePath(constants.DBTypeCity))
-	if err != nil {
-		return ipCity, err
-	}
-	defer db.Close()
-
-	record, err := db.City(parsedIP)
+	record, err := GetDB(constants.DBTypeCity).City(parsedIP)
 	if err != nil {
 		return ipCity, err
 	}
@@ -111,13 +98,7 @@ func IP2ASN(ip string) (IPASN, error) {
 		return ipAsn, constants.ErrInvalidIP
 	}
 
-	db, err := geoip2.Open(GetDBFilePath(constants.DBTypeASN))
-	if err != nil {
-		return ipAsn, err
-	}
-	defer db.Close()
-
-	record, err := db.ASN(parsedIP)
+	record, err := GetDB(constants.DBTypeASN).ASN(parsedIP)
 	if err != nil {
 		return ipAsn, err
 	}
