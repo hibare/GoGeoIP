@@ -7,7 +7,7 @@ updates:
       interval: "weekly"
       day: "friday"
       time: "00:30"
-    target-branch: "dev"
+    target-branch: "main"
     assignees:
       - "hibare"
     groups:
@@ -22,7 +22,7 @@ updates:
       interval: "weekly"
       day: "friday"
       time: "00:30"
-    target-branch: "dev"
+    target-branch: "main"
     assignees:
       - "hibare"
     allow:
@@ -40,7 +40,7 @@ updates:
       interval: "weekly"
       day: "friday"
       time: "00:30"
-    target-branch: "dev"
+    target-branch: "main"
     assignees:
       - "hibare"
     groups:
