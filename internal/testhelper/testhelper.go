@@ -59,5 +59,6 @@ func LoadTestDB() error {
 			return err
 		}
 	}
+
 	return nil
 }

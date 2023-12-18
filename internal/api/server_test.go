@@ -11,6 +11,7 @@ import (
 	commonMiddleware "github.com/hibare/GoCommon/pkg/http/middleware"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/GoGeoIP/internal/maxmind"
 	"github.com/hibare/GoGeoIP/internal/testhelper"
 	"github.com/stretchr/testify/assert"
 )
@@ -158,6 +159,9 @@ func TestGeoIP200(t *testing.T) {
 	err := testhelper.LoadTestDB()
 	assert.NoError(t, err)
 
+	err = maxmind.LoadAllDB()
+	assert.NoError(t, err)
+
 	t.Cleanup(func() {
 		os.RemoveAll(constants.AssetDir)
 	})
@@ -193,6 +197,9 @@ func TestGeoIP200(t *testing.T) {
 
 func TestMyIP200(t *testing.T) {
 	err := testhelper.LoadTestDB()
+	assert.NoError(t, err)
+
+	err = maxmind.LoadAllDB()
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {

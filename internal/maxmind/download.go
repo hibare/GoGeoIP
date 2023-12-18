@@ -130,6 +130,8 @@ func DownloadAllDB() {
 			log.Fatalf("Error downloading DB: %v", err)
 		}
 	}
+
+	LoadAllDB()
 }
 
 func RunDBDownloadJob() {
