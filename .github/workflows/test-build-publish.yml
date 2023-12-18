@@ -70,8 +70,8 @@ jobs:
       - name: image-build-publish
         uses: hibare/.github/github/shared-workflows/docker-image-build-publish@030fa3508e984f9e90dd35f107883798e85e86e4 # v0.2.0
         with:
-          image_names: ${{ needs.set-docker-image-names.outputs.docker_image_names }}
-          tags: ${{ needs.set-docker-tags.outputs.docker_tags }}
+          image_names: ${{ steps.set-docker-image-names.outputs.docker_image_names }}
+          tags: ${{ steps.set-docker-tags.outputs.docker_tags }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
           push_dockerhub: ${{ github.event_name != 'pull_request' }}
           push_ghcr: ${{ github.event_name != 'pull_request' }}
