@@ -1,12 +1,9 @@
 name: Test, Dev Build & Release Publish
 
-# When its time to do a release do a full cross platform build for all supported
-# architectures and push all of them to Docker Hub and GitHub Container Registry.
-# Only trigger on semver shaped tags.
 on:
   push:
     tags:
-      - "*"
+      - "v*"
     branches:
       - dev
 
@@ -16,100 +13,69 @@ on:
       - "dev"
     paths-ignore:
       - "**/README.md"
-      - "**/.github"
 
 jobs:
-  docker-image-test-publish:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version-file: go.mod
 
-      - name: Go Test
+      - name: Run Test
         run: make test
 
+  docker-image-build-publish:
+    runs-on: ubuntu-latest
+    needs: [run-tests]
+    permissions:
+      contents: write
+      id-token: write # For cosign
+      packages: write # For GHCR
+    steps:
       - name: Set Docker Tags
         id: set-docker-tags
-        run: |
-          DOCKER_TAGS="unknown"
-
-          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-            DOCKER_TAGS="dev"
+        run: |          
+          if [ "${{ github.event_name }}" == "push" ]; then
+            if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+              DOCKER_TAGS="next"
+            elif [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
+              DOCKER_TAGS="type=semver,pattern={{version}} type=semver,pattern={{major}}"
+            else
+              echo "Unknown ref: ${{ github.ref }}"
+              exit 1
+            fi
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            DOCKER_TAGS="test"
           else
-            DOCKER_TAGS="type=semver,pattern={{version}},type=semver,pattern={{major}}"
+            echo "Unknown event: ${{ github.event_name }}"
+            exit 1
           fi
 
-          echo "::set-output name=docker_tags::$DOCKER_TAGS"
+          echo "docker_tags=$DOCKER_TAGS" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Set Docker Image Names
         id: set-docker-image-names
         run: |
-          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-            IMAGE_NAMES="hibare/go-geo-ip"
-          else
-            IMAGE_NAMES="hibare/go-geo-ip,ghcr.io/hibare/go-geo-ip"
-          fi
-
-          echo "::set-output name=docker_image_names::$IMAGE_NAMES"
+          IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
+          
+          echo "docker_image_names=$IMAGE_NAMES" >> $GITHUB_OUTPUT
         shell: bash
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
+  
+      - name: image-build-publish
+        uses: hibare/.github/github/shared-workflows/docker-image-build-publish@030fa3508e984f9e90dd35f107883798e85e86e4 # v0.2.0
         with:
-          images: ${{ steps.set-docker-image-names.outputs.docker_image_names}}
+          image_names: ${{ steps.set-docker-image-names.outputs.docker_image_names }}
           tags: ${{ steps.set-docker-tags.outputs.docker_tags }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: all
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Login to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v5
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-          build-args: |
-            GIT_VERSION_TAG=${{ env.RELEASE_VERSION }}
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+          push_dockerhub: ${{ github.event_name != 'pull_request' }}
+          push_ghcr: ${{ github.event_name != 'pull_request' }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
