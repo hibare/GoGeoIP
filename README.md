@@ -17,6 +17,13 @@ MaxMind offers City, Country & ASN Lite databases for free for individual uses.
 
 The program downloads City, Country and ASN databases from MaxMind and runs lookups on local DB.
 
+1. [Features](#features)
+2. [Getting Started](#getting-started)
+3. [Endpoints](#endpoints)
+4. [CLI](#cli)
+5. [Environment Variables](#environment-variables)
+6. [Contributing](#contributing)
+
 ## Features
 
 - Rest API to translate IP to Geo info
@@ -40,7 +47,7 @@ To use GoGeoIP, you require MaxMind license key to download lite databases. Head
 ### Docker run
 
 ```shell
-docker run -it -p 5000:5000 -e DB_LICENSE_KEY=<LICENSE_KEY> -e API_LISTEN_ADDR=0.0.0.0 -e API_KEYS=test-key  hibare/go-geo-ip
+docker run -it -p 5000:5000 -e DB_LICENSE_KEY=<LICENSE_KEY> -e API_LISTEN_ADDR=0.0.0.0 -e API_KEYS=test-key hibare/go-geo-ip
 ```
 
 Replace `<LICENSE_KEY>` with the license key from MaxMind.
@@ -172,25 +179,25 @@ Flags:
 Use "go_geo_ip [command] --help" for more information about a command.
 ```
 
-## Start API Server
+### Start API Server
 
 ```shell
 ❯ go_geo_ip serve
 ```
 
-## Download DB
+### Download DB
 
 ```shell
 ❯ go_geo_ip db download
 ```
 
-## List API Keys
+### List API Keys
 
 ```shell
 ❯ go_geo_ip keys list
 ```
 
-## Version
+### Version
 
 ```shell
 ❯ go_geo_ip --version
@@ -206,3 +213,25 @@ Use "go_geo_ip [command] --help" for more information about a command.
 | DB_LICENSE_KEY         | MaxMind License key                                  | Yes      | -                             | string                          |
 | DB_AUTOUPDATE          | Flag to enable/disable DB auto-update                | No       | true                          | boolean                         |
 | DB_AUTOUPDATE_INTERVAL | Auto update interval.                                | No       | 24 Hours                      | Time duration (ex: 24h, 1h, 6h) |
+
+
+## Contributing
+
+### Requirements
+
+To participate in GoGepIP development, ensure you have the most up-to-date versions of Go, Docker, and make installed. While we suggest using vscode for development, other IDEs are also suitable.
+
+### Run Local Service
+```shell
+make api-up
+```
+
+### Build Docker image
+```shell
+make docker-build
+```
+
+### Run tests
+```shell
+make test
+```
