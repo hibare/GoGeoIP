@@ -136,7 +136,7 @@ docker compose up
   "latitude": 37.751,
   "longitude": -97.822,
   "asn": 15169,
-  "oraganization": "GOOGLE",
+  "organization": "GOOGLE",
   "ip": "8.8.8.8"
 }
 ```

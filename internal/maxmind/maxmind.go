@@ -28,7 +28,7 @@ type IPCity struct {
 type IPASN struct {
 	IP           string `json:"ip"`
 	ASN          uint   `json:"asn"`
-	Organization string `json:"oraganization"`
+	Organization string `json:"organization"`
 }
 
 type GeoIP struct {
