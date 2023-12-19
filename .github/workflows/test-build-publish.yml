@@ -16,6 +16,7 @@ on:
       - "**/Makefile"
       - "**/.env.**"
       - "**/docker-compose.*.yml"
+      - "**/.vscode"
 
 jobs:
   run-tests:
