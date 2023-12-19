@@ -6,27 +6,43 @@ MAKEFLAGS += -s
 GODOTENV_CMD_PATH = $$GOPATH/bin/godotenv
 DOCKER_COMPOSE_PREFIX = HOST_UID=${UID} HOST_GID=${GID} docker-compose -f docker-compose.dev.yml
 
-all: api-up
+# Bold
+BCYAN=\033[1;36m
+BBLUE=\033[1;34m
 
-api-up:
+# No color (Reset)
+NC=\033[0m
+
+.DEFAULT_GOAL := help
+
+.PHONY: api-up
+api-up: ## Start API (dev)
 	go mod tidy
 	${DOCKER_COMPOSE_PREFIX} up api
 
-api-down:
+.PHONY: api-down
+api-down: ## Stop API (dev)
 	${DOCKER_COMPOSE_PREFIX} rm -fsv api
 
-test:
+.PHONY: test
+test: ## Run tests
 	go test ./... -cover
 
-clean: 
+.PHONY: clean
+clean: ## Cleanup
 	${DOCKER_COMPOSE_PREFIX} down
 	go mod tidy
 
-prod-up:
-	docker build -t hibare/go-geo-ip . 
+.PHONY: prod-up
+prod-up: ## start prod API
+	$(MAKE) docker-build
 	docker compose up
 
-docker-build:
+.PHONY: docker-build
+docker-build: ## Build docker image
 	docker build -t hibare/go-geo-ip . 
 
-.PHONY = all clean api-up api-down test prod-up docker-build
+.PHONY: help
+help: ## Disply this help
+		echo -e "\n$(BBLUE)GoGeoIP: IP Geolocation Service$(NC)\n"
+		@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-18s$(NC)%s\n", $$1, $$2}'
