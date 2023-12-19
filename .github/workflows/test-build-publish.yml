@@ -13,6 +13,9 @@ on:
       - "dev"
     paths-ignore:
       - "**/README.md"
+      - "**/Makefile"
+      - "**/.env.**"
+      - "**/docker-compose.*.yml"
 
 jobs:
   run-tests:
