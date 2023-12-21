@@ -4,6 +4,7 @@
         "geoip",
         "hibare",
         "logrus",
+        "maxmind",
         "mmdb",
         "sirupsen"
     ]

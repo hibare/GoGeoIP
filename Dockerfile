@@ -3,7 +3,7 @@ FROM golang:1.21.5-alpine AS base
 # ================== Build App ================== #
 FROM base AS build
 
-ARG GIT_VERSION_TAG=dev
+ARG VERSION=0.0.0
 
 # Install healthcheck cmd
 RUN apk update \
@@ -16,7 +16,7 @@ COPY . /src/
 
 RUN apk --no-cache add ca-certificates
 
-RUN CGO_ENABLED=0 go build -ldflags "-X github.com/hibare/GoGeoIP/cmd.Version=$GIT_VERSION_TAG" -o /bin/go_geo_ip ./main.go
+RUN CGO_ENABLED=0 go build -ldflags "-X github.com/hibare/GoGeoIP/cmd.Version=$VERSION" -o /bin/go_geo_ip ./main.go
 
 # ================== Build Final Image ================== #
 FROM alpine
