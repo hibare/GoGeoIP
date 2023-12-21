@@ -8,7 +8,8 @@ ARG VERSION=0.0.0
 # Install healthcheck cmd
 RUN apk update \
     && apk add curl \
-    && curl -sfL https://raw.githubusercontent.com/hibare/go-docker-healthcheck/main/install.sh | sh -s -- -d -b /usr/local/bin
+    && apk add cosign \
+    && curl -sfL https://raw.githubusercontent.com/hibare/go-docker-healthcheck/main/install.sh | sh -s -- -d -v -b /usr/local/bin
 
 WORKDIR /src/
 
