@@ -45,44 +45,46 @@ jobs:
       id-token: write # For cosign
       packages: write # For GHCR
     steps:
-      - name: Set Docker Tags
-        id: set-docker-tags
+      - name: Set Metadata
+        id: set-metadata
         run: |          
+          DOCKER_TAGS="unknown"
+          VERSION="unknown"
+          IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
+
           if [ "${{ github.event_name }}" == "push" ]; then
             if [ "${{ github.ref }}" == "refs/heads/main" ]; then
               DOCKER_TAGS="next"
+              VERSION="next"
             elif [[ "${{ github.ref }}" == "refs/tags/v"* ]]; then
               DOCKER_TAGS="type=semver,pattern={{version}} type=semver,pattern={{major}}"
+              VERSION="${GITHUB_REF#refs/tags/v}"
             else
               echo "Unknown ref: ${{ github.ref }}"
               exit 1
             fi
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
             DOCKER_TAGS="test"
+            VERSION="test"
           else
             echo "Unknown event: ${{ github.event_name }}"
             exit 1
           fi
 
-          echo "docker_tags=$DOCKER_TAGS" >> $GITHUB_OUTPUT
-        shell: bash
-
-      - name: Set Docker Image Names
-        id: set-docker-image-names
-        run: |
-          IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
-          
           echo "docker_image_names=$IMAGE_NAMES" >> $GITHUB_OUTPUT
+          echo "docker_tags=$DOCKER_TAGS" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
         shell: bash
   
       - name: image-build-publish
         uses: hibare/.github/github/shared-workflows/docker-image-build-publish@030fa3508e984f9e90dd35f107883798e85e86e4 # v0.2.0
         with:
-          image_names: ${{ steps.set-docker-image-names.outputs.docker_image_names }}
-          tags: ${{ steps.set-docker-tags.outputs.docker_tags }}
+          image_names: ${{ steps.set-metadata.outputs.docker_image_names }}
+          tags: ${{ steps.set-metadata.outputs.docker_tags }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
           push_dockerhub: ${{ github.event_name != 'pull_request' }}
           push_ghcr: ${{ github.event_name != 'pull_request' }}
+          build_args: VERSION=${{ steps.set-metadata.outputs.version }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
