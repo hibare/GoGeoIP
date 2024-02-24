@@ -45,9 +45,12 @@ jobs:
       id-token: write # For cosign
       packages: write # For GHCR
     steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
       - name: Set Metadata
         id: set-metadata
-        run: |          
+        run: |
           DOCKER_TAGS="unknown"
           VERSION="unknown"
           IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
@@ -71,11 +74,14 @@ jobs:
             exit 1
           fi
 
+          GOLANG_VERSION=$(grep -oP '^go (\d+(\.\d+)*)' go.mod | awk '{print $2}')
+
           echo "docker_image_names=$IMAGE_NAMES" >> $GITHUB_OUTPUT
           echo "docker_tags=$DOCKER_TAGS" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "golang_version=$GOLANG_VERSION" >> $GITHUB_OUTPUT
         shell: bash
-  
+
       - name: image-build-publish
         uses: hibare/.github/github/shared-workflows/docker-image-build-publish@afd7e905777e60f391444be841383e6147816805 # v0.3.1
         with:
@@ -84,7 +90,7 @@ jobs:
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
           push_dockerhub: ${{ github.event_name != 'pull_request' }}
           push_ghcr: ${{ github.event_name != 'pull_request' }}
-          build_args: VERSION=${{ steps.set-metadata.outputs.version }}
+          build_args: VERSION=${{ steps.set-metadata.outputs.version }} GOLANG_VERSION=${{ steps.set-metadata.outputs.golang_version }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
