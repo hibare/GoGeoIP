@@ -1,4 +1,6 @@
-FROM golang:1.22.0-alpine AS base
+ARG GOLANG_VERSION
+
+FROM golang:${GOLANG_VERSION}-alpine AS base
 
 # ================== Build App ================== #
 FROM base AS build
