@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/hibare/GoCommon/pkg/env"
+	"github.com/hibare/GoCommon/v2/pkg/env"
 	"github.com/hibare/GoGeoIP/internal/constants"
 )
 

@@ -7,8 +7,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/go-chi/chi/v5"
-	commonErrors "github.com/hibare/GoCommon/pkg/errors"
-	commonHttp "github.com/hibare/GoCommon/pkg/http"
+	commonErrors "github.com/hibare/GoCommon/v2/pkg/errors"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/maxmind"
 )

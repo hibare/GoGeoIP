@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hibare/GoCommon/pkg/errors"
-	commonMiddleware "github.com/hibare/GoCommon/pkg/http/middleware"
+	"github.com/hibare/GoCommon/v2/pkg/errors"
+	commonMiddleware "github.com/hibare/GoCommon/v2/pkg/http/middleware"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/maxmind"

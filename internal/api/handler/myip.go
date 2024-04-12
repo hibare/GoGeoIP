@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	commonErrors "github.com/hibare/GoCommon/pkg/errors"
-	commonHttp "github.com/hibare/GoCommon/pkg/http"
-	commonIP "github.com/hibare/GoCommon/pkg/net/ip"
+	commonErrors "github.com/hibare/GoCommon/v2/pkg/errors"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
+	commonIP "github.com/hibare/GoCommon/v2/pkg/net/ip"
 
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/maxmind"
