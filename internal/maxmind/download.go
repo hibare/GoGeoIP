@@ -9,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/hibare/GoCommon/pkg/file"
+	"github.com/hibare/GoCommon/v2/pkg/file"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
 )

@@ -13,8 +13,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-playground/validator/v10"
-	commonHandler "github.com/hibare/GoCommon/pkg/http/handler"
-	commonMiddleware "github.com/hibare/GoCommon/pkg/http/middleware"
+	commonHandler "github.com/hibare/GoCommon/v2/pkg/http/handler"
+	commonMiddleware "github.com/hibare/GoCommon/v2/pkg/http/middleware"
 	"github.com/hibare/GoGeoIP/internal/api/handler"
 	"github.com/hibare/GoGeoIP/internal/config"
 )
