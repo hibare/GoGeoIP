@@ -17,8 +17,8 @@ github.com/go-playground/validator/v10 v10.22.0 h1:k6HsTZ0sTnROkhS//R0O+55JgM8C4
 github.com/go-playground/validator/v10 v10.22.0/go.mod h1:dbuPbCMFw/DrkbEynArYaCwl3amGuJotoKCe95atGMM=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/hibare/GoCommon/v2 v2.12.0 h1:REcmiC/JwPFGqc4YXHFsfWQ/ZBmzw1/EJ5ashoAJafY=
-github.com/hibare/GoCommon/v2 v2.12.0/go.mod h1:cL6pb1RNdSCnUl7ifjpOmUKV4ZPfJ6MLDtBaYyHVO6g=
+github.com/hibare/GoCommon/v2 v2.13.0 h1:pAIRXOgCYP0l6mdS+um6grMLk+hOy1E2a4MrgYYq/yE=
+github.com/hibare/GoCommon/v2 v2.13.0/go.mod h1:Tg0tS9gdGiggHee2mgo2yHPF2h5Cr/eCtarN1t5u5+8=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
