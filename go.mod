@@ -3,7 +3,7 @@ module github.com/hibare/GoGeoIP
 go 1.21
 
 require (
-	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/google/uuid v1.6.0
 	github.com/hibare/GoCommon/v2 v2.19.0
