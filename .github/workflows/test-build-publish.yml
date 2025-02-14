@@ -83,7 +83,7 @@ jobs:
         shell: bash
 
       - name: image-build-publish
-        uses: hibare/.github/github/shared-workflows/docker-image-build-publish@038e5ef85c308f76e396c8a886a7ae31b8494367 # v0.6.0
+        uses: hibare/.github/github/shared-workflows/docker-image-build-publish@f19c582cd7572c97ceb4a0a993b697ab206768f7 # v0.7.0
         with:
           image_names: ${{ steps.set-metadata.outputs.docker_image_names }}
           tags: ${{ steps.set-metadata.outputs.docker_tags }}
