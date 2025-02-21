@@ -1,6 +1,7 @@
 module github.com/hibare/GoGeoIP
 
-go 1.21
+go 1.24.0
+
 require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/validator/v10 v10.25.0
