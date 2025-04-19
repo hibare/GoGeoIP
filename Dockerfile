@@ -1,30 +1,31 @@
-ARG GOLANG_VERSION
+ARG GOLANG_VERSION=1.24.0
 
-FROM golang:${GOLANG_VERSION:-1.24.0}-alpine AS base
+FROM golang:${GOLANG_VERSION}-alpine AS base
 
 # ================== Build App ================== #
 FROM base AS build
 
 ARG VERSION=0.0.0
 
+# Set shell options
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 # Install healthcheck cmd
+# hadolint ignore=DL3018
 RUN apk update \
-    && apk add curl \
-    && apk add cosign \
+    && apk add curl cosign ca-certificates --no-cache \
     && curl -sfL https://raw.githubusercontent.com/hibare/go-docker-healthcheck/main/install.sh | sh -s -- -d -v -b /usr/local/bin
 
 WORKDIR /src/
 
 COPY . /src/
 
-RUN apk --no-cache add ca-certificates
-
 RUN CGO_ENABLED=0 go build -ldflags "-X github.com/hibare/GoGeoIP/cmd.Version=$VERSION" -o /bin/go_geo_ip ./main.go
 
 # ================== Build Final Image ================== #
-FROM alpine
+FROM alpine:3
 
-ENV API_LISTEN_ADDR 0.0.0.0
+ENV API_LISTEN_ADDR=0.0.0.0
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 

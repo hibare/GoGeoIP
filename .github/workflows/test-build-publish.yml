@@ -29,15 +29,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Set up Go
+      - name: Setup Go
         uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version-file: go.mod
 
-      - name: Run Test
-        run: make test
+      - name: Setup Python
+        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+
+      - name: Install GolangCI Lint
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/2b224c2cf4c9f261c22a16af7f8ca6408467f338/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.0.2
+
+      - name: Run Pre-Commits
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   docker-image-build-publish:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: [run-tests]
     permissions:

@@ -14,11 +14,11 @@ var ListKeysCmd = &cobra.Command{
 	Short: "List API Keys",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("\nAvaialable API Keys")
+		fmt.Println("\nAvailable API Keys")
 		fmt.Println("--------------------")
 
-		for _, apikey := range config.Current.API.APIKeys {
-			qrCode, err := qrcode.New(apikey, qrcode.Medium)
+		for _, apiKey := range config.Current.API.APIKeys {
+			qrCode, err := qrcode.New(apiKey, qrcode.Medium)
 			if err != nil {
 				fmt.Printf("Error: %s\n", err)
 				continue
