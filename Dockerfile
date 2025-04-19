@@ -1,6 +1,6 @@
 ARG GOLANG_VERSION
 
-FROM golang:${GOLANG_VERSION}-alpine AS base
+FROM golang:${GOLANG_VERSION:-1.24.0}-alpine AS base
 
 # ================== Build App ================== #
 FROM base AS build
