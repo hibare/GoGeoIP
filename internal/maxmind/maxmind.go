@@ -6,6 +6,10 @@ import (
 	"github.com/hibare/GoGeoIP/internal/constants"
 )
 
+type IPInfo struct {
+	IP string `json:"ip"`
+}
+
 type IPCountry struct {
 	IP                  string `json:"ip"`
 	Country             string `json:"country"`
