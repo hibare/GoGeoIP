@@ -105,6 +105,15 @@ func downloadDB(dbType string) error {
 	return nil
 }
 
+func dbFileExists(dbType string) bool {
+	dbFilePath := GetDBFilePath(dbType)
+
+	if _, err := os.Stat(dbFilePath); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
 func DownloadCountryDB() error {
 	return downloadDB(constants.DBTypeCountry)
 }
@@ -117,6 +126,10 @@ func DownloadASNDB() error {
 	return downloadDB(constants.DBTypeASN)
 }
 
+func checkAllDBFilesExist() bool {
+	return dbFileExists(constants.DBTypeCountry) && dbFileExists(constants.DBTypeCity) && dbFileExists(constants.DBTypeASN)
+}
+
 func DownloadAllDB() {
 	log.Infof("Downloading all DB files")
 
@@ -127,7 +140,12 @@ func DownloadAllDB() {
 	}
 	for _, err := range errors {
 		if err != nil {
-			log.Fatalf("Error downloading DB: %v", err)
+			exists := checkAllDBFilesExist()
+			if !exists {
+				log.Fatalf("Error downloading DB: %v", err)
+			}
+			log.Errorf("Error downloading DB: %v", err)
+			log.Warn("Continuing with existing DB files")
 		}
 	}
 
