@@ -12,7 +12,7 @@ var (
 	dbCountryReader *geoip2.Reader
 	dbCityReader    *geoip2.Reader
 	dbAsnReader     *geoip2.Reader
-	dbLock					sync.Mutex
+	dbLock          sync.Mutex
 )
 
 func LoadAllDB() error {
