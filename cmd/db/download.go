@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var dBDowloadCmd = &cobra.Command{
+var dBDownloadCmd = &cobra.Command{
 	Use:   "download",
 	Short: "Download Geo IP DB",
 	Long:  "",
