@@ -1,12 +1,9 @@
 package config
 
 import (
-	"os"
+	"log"
 	"path/filepath"
 	"time"
-
-	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/hibare/GoCommon/v2/pkg/env"
 	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
@@ -18,12 +15,6 @@ import (
 type LoggerConfig struct {
 	Level string
 	Mode  string
-}
-
-// DBConfig defines database configuration parameters.
-type UtilConfig struct {
-	AssetDirPath string
-	IsDev        bool
 }
 
 // APIConfig defines API configuration parameters.
@@ -48,7 +39,6 @@ type Config struct {
 	Logger LoggerConfig
 	DB     DBConfig
 	Server ServerConfig
-	Util   UtilConfig
 }
 
 func (c Config) GetAssetDirPath() (string, error) {
@@ -59,16 +49,6 @@ var Current *Config
 
 func Load() {
 	env.Load()
-
-	token := []string{
-		uuid.New().String(),
-	}
-
-	assetDir, err := filepath.Abs(constants.AssetDir)
-
-	if err != nil {
-		log.Fatalf("Unable to load config, %s", err.Error())
-	}
 
 	Current = &Config{
 		Logger: LoggerConfig{
@@ -81,16 +61,12 @@ func Load() {
 			AutoUpdateInterval: env.MustDuration("GO_GEOIP_DB_AUTOUPDATE_INTERVAL", constants.DefaultDBAutoUpdateInterval),
 		},
 		Server: ServerConfig{
-			ListenAddr:   env.MustString("GO_GEOIP_API_LISTEN_ADDR", constants.DefaultAPIListenAddr),
-			ListenPort:   env.MustInt("GO_GEOIP_API_LISTEN_PORT", constants.DefaultAPIListenPort),
-			APIKeys:      env.MustStringSlice("GO_GEOIP_API_KEYS", token),
-			ReadTimeout:  env.MustDuration("GO_GEOIP_API_READ_TIMEOUT", commonHttp.DefaultServerTimeout),
-			WriteTimeout: env.MustDuration("GO_GEOIP_API_WRITE_TIMEOUT", commonHttp.DefaultServerWriteTimeout),
-			IdleTimeout:  env.MustDuration("GO_GEOIP_API_IDLE_TIMEOUT", commonHttp.DefaultServerIdleTimeout),
-		},
-		Util: UtilConfig{
-			AssetDirPath: assetDir,
-			IsDev:        env.MustBool("IS_DEV", false),
+			ListenAddr:   env.MustString("GO_GEOIP_SERVER_LISTEN_ADDR", constants.DefaultAPIListenAddr),
+			ListenPort:   env.MustInt("GO_GEOIP_SERVER_LISTEN_PORT", constants.DefaultAPIListenPort),
+			APIKeys:      env.MustStringSlice("GO_GEOIP_SERVER_API_KEYS", []string{}),
+			ReadTimeout:  env.MustDuration("GO_GEOIP_SERVER_READ_TIMEOUT", commonHttp.DefaultServerTimeout),
+			WriteTimeout: env.MustDuration("GO_GEOIP_SERVER_WRITE_TIMEOUT", commonHttp.DefaultServerWriteTimeout),
+			IdleTimeout:  env.MustDuration("GO_GEOIP_SERVER_IDLE_TIMEOUT", commonHttp.DefaultServerIdleTimeout),
 		},
 	}
 
@@ -107,11 +83,4 @@ func Load() {
 	}
 
 	commonLogger.InitLogger(&Current.Logger.Level, &Current.Logger.Mode)
-
-	// Create asset dir
-	if err := os.MkdirAll(constants.AssetDir, os.ModePerm); err != nil {
-		log.Fatalf("Failed to create asset dir: %s", err)
-	}
-
-	log.Info("Loaded config")
 }

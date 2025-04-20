@@ -1,104 +1,158 @@
 package config
 
 import (
+	"errors"
 	"os"
-	"strconv"
+	"os/exec"
 	"testing"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
-	"github.com/hibare/GoGeoIP/internal/constants"
+	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testDBLicenseKey         = "test-license"
-	testDBAutoUpdate         = false
-	testDBAutoUpdateInterval = 2 * time.Hour
-	testAPIListenAddr        = "127.0.0.1"
-	testAPIListenPort        = 10000
-	testAPIKeys              = "test-api-key"
-	testIsDev                = true
-)
+func TestLoad(t *testing.T) {
+	tests := []struct {
+		name     string
+		envVars  map[string]string
+		expected *Config
+	}{
+		{
+			name: "all defaults",
+			envVars: map[string]string{
+				"GO_GEOIP_DB_LICENSE_KEY": "test-secret",
+			},
+			expected: &Config{
+				Logger: LoggerConfig{
+					Level: commonLogger.DefaultLoggerLevel,
+					Mode:  commonLogger.DefaultLoggerMode,
+				},
+				DB: DBConfig{
+					LicenseKey:         "test-secret",
+					AutoUpdateEnabled:  true,
+					AutoUpdateInterval: 24 * time.Hour,
+				},
+				Server: ServerConfig{
+					ListenAddr:   "0.0.0.0",
+					ListenPort:   5000,
+					APIKeys:      []string{},
+					ReadTimeout:  60 * time.Second,
+					WriteTimeout: 15 * time.Second,
+					IdleTimeout:  60 * time.Second,
+				},
+			},
+		},
+		{
+			name: "custom values",
+			envVars: map[string]string{
+				"GO_GEOIP_LOG_LEVEL":              "debug",
+				"GO_GEOIP_LOG_MODE":               "json",
+				"GO_GEOIP_DB_LICENSE_KEY":         "test-secret",
+				"GO_GEOIP_DB_AUTOUPDATE_ENABLED":  "false",
+				"GO_GEOIP_DB_AUTOUPDATE_INTERVAL": "1h",
+				"GO_GEOIP_SERVER_LISTEN_ADDR":     "127.0.0.1",
+				"GO_GEOIP_SERVER_LISTEN_PORT":     "8080",
+				"GO_GEOIP_SERVER_API_KEYS":        "test-key-1,test-key-2",
+				"GO_GEOIP_SERVER_READ_TIMEOUT":    "30s",
+				"GO_GEOIP_SERVER_WRITE_TIMEOUT":   "10s",
+				"GO_GEOIP_SERVER_IDLE_TIMEOUT":    "120s",
+			},
+			expected: &Config{
+				Logger: LoggerConfig{
+					Level: "debug",
+					Mode:  "json",
+				},
+				DB: DBConfig{
+					LicenseKey:         "test-secret",
+					AutoUpdateEnabled:  false,
+					AutoUpdateInterval: 1 * time.Hour,
+				},
+				Server: ServerConfig{
+					ListenAddr:   "127.0.0.1",
+					ListenPort:   8080,
+					APIKeys:      []string{"test-key-1", "test-key-2"},
+					ReadTimeout:  30 * time.Second,
+					WriteTimeout: 10 * time.Second,
+					IdleTimeout:  120 * time.Second,
+				},
+			},
+		},
+	}
 
-func TestEnvLoadedConfig(t *testing.T) {
-	// Set test env vars
-	os.Setenv("DB_LICENSE_KEY", testDBLicenseKey)
-	os.Setenv("DB_AUTOUPDATE", strconv.FormatBool(testDBAutoUpdate))
-	os.Setenv("DB_AUTOUPDATE_INTERVAL", testDBAutoUpdateInterval.String())
-	os.Setenv("API_LISTEN_ADDR", testAPIListenAddr)
-	os.Setenv("API_LISTEN_PORT", strconv.Itoa(testAPIListenPort))
-	os.Setenv("API_KEYS", testAPIKeys)
-	os.Setenv("IS_DEV", strconv.FormatBool(testIsDev))
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Set test environment variables
+			for key, value := range tt.envVars {
+				t.Setenv(key, value)
+			}
 
-	Load()
-	defer os.RemoveAll(constants.AssetDir)
+			// Load config
+			Load()
 
-	assert.Equal(t, testAPIListenAddr, Current.Server.ListenAddr)
-	assert.Equal(t, testAPIListenPort, Current.Server.ListenPort)
-	assert.Equal(t, []string{testAPIKeys}, Current.Server.APIKeys)
-	assert.Equal(t, testDBLicenseKey, Current.DB.LicenseKey)
-	assert.Equal(t, testDBAutoUpdate, Current.DB.AutoUpdateEnabled)
-	assert.Equal(t, testDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
-	assert.Equal(t, testIsDev, Current.Util.IsDev)
-
-	// Check asset dir
-	_, err := os.Stat(Current.Util.AssetDirPath)
-	assert.NoError(t, err)
-	assert.NotErrorIs(t, err, os.ErrNotExist)
-
-	// Unset all env vars except
-	os.Unsetenv("DB_LICENSE_KEY")
-	os.Unsetenv("DB_AUTOUPDATE")
-	os.Unsetenv("DB_AUTOUPDATE_INTERVAL")
-	os.Unsetenv("API_LISTEN_ADDR")
-	os.Unsetenv("API_LISTEN_PORT")
-	os.Unsetenv("API_KEYS")
-	os.Unsetenv("IS_DEV")
-
+			// Verify config
+			assert.Equal(t, tt.expected, Current)
+		})
+	}
 }
 
-func TestDefaultConfig(t *testing.T) {
-	// Unset all env vars except DB_LICENSE_KEY
-	os.Unsetenv("DB_AUTOUPDATE")
-	os.Unsetenv("DB_AUTOUPDATE_INTERVAL")
-	os.Unsetenv("API_LISTEN_ADDR")
-	os.Unsetenv("API_LISTEN_PORT")
-	os.Unsetenv("API_KEYS")
-	os.Unsetenv("IS_DEV")
+func TestLoad_InvalidLogLevel(t *testing.T) {
+	// Set invalid log level
+	t.Setenv("GO_GEOIP_LOG_LEVEL", "invalid-level")
 
-	os.Setenv("DB_LICENSE_KEY", testDBLicenseKey)
-
-	Load()
-	defer os.RemoveAll(constants.AssetDir)
-
-	assert.Equal(t, constants.DefaultAPIListenAddr, Current.Server.ListenAddr)
-	assert.Equal(t, constants.DefaultAPIListenPort, Current.Server.ListenPort)
-	assert.NotEmpty(t, Current.Server.APIKeys)
-	assert.Len(t, Current.Server.APIKeys, 1)
-	assert.True(t, true, Current.DB.AutoUpdateEnabled)
-	assert.Equal(t, constants.DefaultDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
-	assert.Equal(t, false, Current.Util.IsDev)
-
-	os.Unsetenv("DB_LICENSE_KEY")
+	// Test that Load exits with invalid log level
+	if os.Getenv("TEST_EXIT") == "1" {
+		Load()
+		return
+	}
+	const testName = "TestLoad_InvalidLogLevel"
+	// #nosec G204
+	cmd := exec.Command(os.Args[0], "-test.run=^"+testName+"$")
+	cmd.Env = append(os.Environ(), "TEST_EXIT=1")
+	err := cmd.Run()
+	var e *exec.ExitError
+	if errors.As(err, &e) && !e.Success() {
+		return
+	}
+	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
-func TestDefaultConfigFail(t *testing.T) {
-	// Unset all env vars except DB_LICENSE_KEY
-	os.Unsetenv("DB_AUTOUPDATE")
-	os.Unsetenv("DB_AUTOUPDATE_INTERVAL")
-	os.Unsetenv("API_LISTEN_ADDR")
-	os.Unsetenv("API_LISTEN_PORT")
-	os.Unsetenv("API_KEYS")
-	os.Unsetenv("IS_DEV")
+func TestLoad_InvalidLogMode(t *testing.T) {
+	// Set invalid log mode
+	t.Setenv("GO_GEOIP_LOG_MODE", "invalid-mode")
 
-	defer func() { log.StandardLogger().ExitFunc = nil }()
-	var fatal bool
-	log.StandardLogger().ExitFunc = func(int) { fatal = true }
+	// Test that Load exits with invalid log mode
+	if os.Getenv("TEST_EXIT") == "1" {
+		Load()
+		return
+	}
+	const testName = "TestLoad_InvalidLogMode"
+	// #nosec G204
+	cmd := exec.Command(os.Args[0], "-test.run=^"+testName+"$")
+	cmd.Env = append(os.Environ(), "TEST_EXIT=1")
+	err := cmd.Run()
+	var e *exec.ExitError
+	if errors.As(err, &e) && !e.Success() {
+		return
+	}
+	t.Fatalf("process ran with err %v, want exit status 1", err)
+}
 
-	Load()
-	defer os.RemoveAll(constants.AssetDir)
+func TestLoad_MissingLicenseKey(t *testing.T) {
+	// Test that Load exits when license key is not set
+	if os.Getenv("TEST_EXIT") == "1" {
+		Load()
+		return
+	}
+	_ = os.Unsetenv("GO_GEOIP_DB_LICENSE_KEY")
 
-	assert.Equal(t, true, fatal)
+	const testName = "TestLoad_MissingLicenseKey"
+	// #nosec G204
+	cmd := exec.Command(os.Args[0], "-test.run=^"+testName+"$")
+	cmd.Env = append(os.Environ(), "TEST_EXIT=1")
+	err := cmd.Run()
+	var e *exec.ExitError
+	if errors.As(err, &e) && !e.Success() {
+		return
+	}
+	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
