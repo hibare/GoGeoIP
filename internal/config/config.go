@@ -9,30 +9,50 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/hibare/GoCommon/v2/pkg/env"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
+	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/hibare/GoGeoIP/internal/constants"
 )
 
+// LoggerConfig defines logging configuration parameters.
+type LoggerConfig struct {
+	Level string
+	Mode  string
+}
+
+// DBConfig defines database configuration parameters.
 type UtilConfig struct {
 	AssetDirPath string
 	IsDev        bool
 }
 
+// APIConfig defines API configuration parameters.
 type DBConfig struct {
 	LicenseKey         string
-	AutoUpdate         bool
+	AutoUpdateEnabled  bool
 	AutoUpdateInterval time.Duration
 }
 
-type APIConfig struct {
-	ListenAddr string
-	ListenPort int
-	APIKeys    []string
+// ServerConfig defines API configuration parameters.
+type ServerConfig struct {
+	ListenAddr   string
+	ListenPort   int
+	APIKeys      []string
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+	IdleTimeout  time.Duration
 }
 
+// Config holds the configuration for the application.
 type Config struct {
-	DB   DBConfig
-	API  APIConfig
-	Util UtilConfig
+	Logger LoggerConfig
+	DB     DBConfig
+	Server ServerConfig
+	Util   UtilConfig
+}
+
+func (c Config) GetAssetDirPath() (string, error) {
+	return filepath.Abs(constants.AssetDir)
 }
 
 var Current *Config
@@ -51,15 +71,22 @@ func Load() {
 	}
 
 	Current = &Config{
-		DB: DBConfig{
-			LicenseKey:         env.MustString("DB_LICENSE_KEY", ""),
-			AutoUpdate:         env.MustBool("DB_AUTOUPDATE", constants.DefaultDBAutoUpdate),
-			AutoUpdateInterval: env.MustDuration("DB_AUTOUPDATE_INTERVAL", constants.DefaultDBAutoUpdateInterval),
+		Logger: LoggerConfig{
+			Level: env.MustString("GO_GEOIP_LOG_LEVEL", commonLogger.DefaultLoggerLevel),
+			Mode:  env.MustString("GO_GEOIP_LOG_MODE", commonLogger.DefaultLoggerMode),
 		},
-		API: APIConfig{
-			ListenAddr: env.MustString("API_LISTEN_ADDR", constants.DefaultAPIListenAddr),
-			ListenPort: env.MustInt("API_LISTEN_PORT", constants.DefaultAPIListenPort),
-			APIKeys:    env.MustStringSlice("API_KEYS", token),
+		DB: DBConfig{
+			LicenseKey:         env.MustString("GO_GEOIP_DB_LICENSE_KEY", ""),
+			AutoUpdateEnabled:  env.MustBool("GO_GEOIP_DB_AUTOUPDATE_ENABLED", constants.DefaultDBAutoUpdate),
+			AutoUpdateInterval: env.MustDuration("GO_GEOIP_DB_AUTOUPDATE_INTERVAL", constants.DefaultDBAutoUpdateInterval),
+		},
+		Server: ServerConfig{
+			ListenAddr:   env.MustString("GO_GEOIP_API_LISTEN_ADDR", constants.DefaultAPIListenAddr),
+			ListenPort:   env.MustInt("GO_GEOIP_API_LISTEN_PORT", constants.DefaultAPIListenPort),
+			APIKeys:      env.MustStringSlice("GO_GEOIP_API_KEYS", token),
+			ReadTimeout:  env.MustDuration("GO_GEOIP_API_READ_TIMEOUT", commonHttp.DefaultServerTimeout),
+			WriteTimeout: env.MustDuration("GO_GEOIP_API_WRITE_TIMEOUT", commonHttp.DefaultServerWriteTimeout),
+			IdleTimeout:  env.MustDuration("GO_GEOIP_API_IDLE_TIMEOUT", commonHttp.DefaultServerIdleTimeout),
 		},
 		Util: UtilConfig{
 			AssetDirPath: assetDir,
@@ -68,8 +95,18 @@ func Load() {
 	}
 
 	if len(Current.DB.LicenseKey) <= 0 {
-		log.Fatal("DB_LICENSE_KEY is required")
+		log.Fatal("GO_GEOIP_DB_LICENSE_KEY env var is required")
 	}
+
+	if !commonLogger.IsValidLogLevel(Current.Logger.Level) {
+		log.Fatal("Error invalid logger level")
+	}
+
+	if !commonLogger.IsValidLogMode(Current.Logger.Mode) {
+		log.Fatal("Error invalid logger mode")
+	}
+
+	commonLogger.InitLogger(&Current.Logger.Level, &Current.Logger.Mode)
 
 	// Create asset dir
 	if err := os.MkdirAll(constants.AssetDir, os.ModePerm); err != nil {

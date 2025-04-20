@@ -35,11 +35,11 @@ func TestEnvLoadedConfig(t *testing.T) {
 	Load()
 	defer os.RemoveAll(constants.AssetDir)
 
-	assert.Equal(t, testAPIListenAddr, Current.API.ListenAddr)
-	assert.Equal(t, testAPIListenPort, Current.API.ListenPort)
-	assert.Equal(t, []string{testAPIKeys}, Current.API.APIKeys)
+	assert.Equal(t, testAPIListenAddr, Current.Server.ListenAddr)
+	assert.Equal(t, testAPIListenPort, Current.Server.ListenPort)
+	assert.Equal(t, []string{testAPIKeys}, Current.Server.APIKeys)
 	assert.Equal(t, testDBLicenseKey, Current.DB.LicenseKey)
-	assert.Equal(t, testDBAutoUpdate, Current.DB.AutoUpdate)
+	assert.Equal(t, testDBAutoUpdate, Current.DB.AutoUpdateEnabled)
 	assert.Equal(t, testDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
 	assert.Equal(t, testIsDev, Current.Util.IsDev)
 
@@ -73,11 +73,11 @@ func TestDefaultConfig(t *testing.T) {
 	Load()
 	defer os.RemoveAll(constants.AssetDir)
 
-	assert.Equal(t, constants.DefaultAPIListenAddr, Current.API.ListenAddr)
-	assert.Equal(t, constants.DefaultAPIListenPort, Current.API.ListenPort)
-	assert.NotEmpty(t, Current.API.APIKeys)
-	assert.Len(t, Current.API.APIKeys, 1)
-	assert.True(t, true, Current.DB.AutoUpdate)
+	assert.Equal(t, constants.DefaultAPIListenAddr, Current.Server.ListenAddr)
+	assert.Equal(t, constants.DefaultAPIListenPort, Current.Server.ListenPort)
+	assert.NotEmpty(t, Current.Server.APIKeys)
+	assert.Len(t, Current.Server.APIKeys, 1)
+	assert.True(t, true, Current.DB.AutoUpdateEnabled)
 	assert.Equal(t, constants.DefaultDBAutoUpdateInterval, Current.DB.AutoUpdateInterval)
 	assert.Equal(t, false, Current.Util.IsDev)
 

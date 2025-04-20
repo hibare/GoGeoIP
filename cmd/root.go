@@ -5,10 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/hibare/GoGeoIP/cmd/api"
-	"github.com/hibare/GoGeoIP/cmd/api/keys"
 	"github.com/hibare/GoGeoIP/cmd/db"
 	"github.com/hibare/GoGeoIP/cmd/geoip"
+	"github.com/hibare/GoGeoIP/cmd/keys"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/maxmind"
 )
@@ -29,11 +30,6 @@ func Execute() {
 	}
 }
 
-func ScheduleBackgroundJobs() {
-	// Schedule regular DB update job
-	go maxmind.RunDBDownloadJob()
-}
-
 func init() {
 	rootCmd.AddCommand(db.DBCmd)
 	rootCmd.AddCommand(geoip.GeoIPCmd)
@@ -43,7 +39,7 @@ func init() {
 	config.Load()
 
 	initFuncs := []func(){
-		ScheduleBackgroundJobs,
+		commonLogger.InitDefaultLogger,
 	}
 
 	if !config.Current.Util.IsDev {

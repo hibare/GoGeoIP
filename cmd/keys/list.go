@@ -17,7 +17,7 @@ var ListKeysCmd = &cobra.Command{
 		fmt.Println("\nAvailable API Keys")
 		fmt.Println("--------------------")
 
-		for _, apiKey := range config.Current.API.APIKeys {
+		for _, apiKey := range config.Current.Server.APIKeys {
 			qrCode, err := qrcode.New(apiKey, qrcode.Medium)
 			if err != nil {
 				fmt.Printf("Error: %s\n", err)
