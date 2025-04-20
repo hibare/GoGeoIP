@@ -4,7 +4,6 @@ go 1.24.2
 
 require (
 	github.com/go-chi/chi/v5 v5.2.1
-	github.com/google/uuid v1.6.0
 	github.com/hibare/GoCommon/v2 v2.22.1-0.20250419184844-6c27a0129085
 	github.com/oschwald/geoip2-golang v1.11.0
 	github.com/sirupsen/logrus v1.9.3

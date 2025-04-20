@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+	"log/slog"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -11,7 +13,6 @@ import (
 	"github.com/hibare/GoGeoIP/cmd/geoip"
 	"github.com/hibare/GoGeoIP/cmd/keys"
 	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
 )
 
 var Version = "0.0.0"
@@ -30,6 +31,20 @@ func Execute() {
 	}
 }
 
+func preChecks() {
+	ctx := context.Background()
+	assetDir, err := config.Current.GetAssetDirPath()
+	if err != nil {
+		slog.ErrorContext(ctx, "Failed to get asset dir path", "error", err)
+		os.Exit(1)
+	}
+
+	if err := os.MkdirAll(assetDir, os.ModePerm); err != nil {
+		slog.ErrorContext(ctx, "Failed to create asset dir", "error", err)
+		os.Exit(1)
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(db.DBCmd)
 	rootCmd.AddCommand(geoip.GeoIPCmd)
@@ -40,11 +55,12 @@ func init() {
 
 	initFuncs := []func(){
 		commonLogger.InitDefaultLogger,
+		preChecks,
 	}
 
-	if !config.Current.Util.IsDev {
-		initFuncs = append(initFuncs, maxmind.DownloadAllDB)
-	}
+	// if !config.Current.Util.IsDev {
+	// 	initFuncs = append(initFuncs, maxmind.DownloadAllDB)
+	// }
 
 	cobra.OnInitialize(initFuncs...)
 }
