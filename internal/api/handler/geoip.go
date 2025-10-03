@@ -27,5 +27,5 @@ func GeoIP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	commonHttp.WriteJsonResponse(w, http.StatusOK, ipGeo)
+	commonHttp.WriteJSONResponse(w, http.StatusOK, ipGeo)
 }

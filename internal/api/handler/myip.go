@@ -16,7 +16,7 @@ import (
 func MyIP(w http.ResponseWriter, r *http.Request) {
 	ipStr := r.RemoteAddr
 	if !commonIP.IsPublicIP(ipStr) {
-		commonHttp.WriteJsonResponse(w, http.StatusOK, maxmind.GeoIP{IP: ipStr, Remark: "Non-Public IP"})
+		commonHttp.WriteJSONResponse(w, http.StatusOK, maxmind.GeoIP{IP: ipStr, Remark: "Non-Public IP"})
 		return
 	}
 
@@ -31,5 +31,5 @@ func MyIP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	commonHttp.WriteJsonResponse(w, http.StatusOK, ipGeo)
+	commonHttp.WriteJSONResponse(w, http.StatusOK, ipGeo)
 }
