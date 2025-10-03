@@ -230,23 +230,23 @@ func TestDownloadDB(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			err := downloadDB(tc.DBType)
+			err := downloadDB(t.Context(), tc.DBType)
 			assert.NoError(t, err)
 		})
 	}
 
 	t.Run("Download City", func(t *testing.T) {
-		err := DownloadCityDB()
+		err := DownloadCityDB(t.Context())
 		assert.NoError(t, err)
 	})
 
 	t.Run("Download Country", func(t *testing.T) {
-		err := DownloadCountryDB()
+		err := DownloadCountryDB(t.Context())
 		assert.NoError(t, err)
 	})
 
 	t.Run("Download ASN", func(t *testing.T) {
-		err := DownloadASNDB()
+		err := DownloadASNDB(t.Context())
 		assert.NoError(t, err)
 	})
 

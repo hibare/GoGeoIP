@@ -1,6 +1,7 @@
 package maxmind
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/hibare/GoCommon/v2/pkg/crypto/hash"
 	"github.com/hibare/GoCommon/v2/pkg/file"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
@@ -47,7 +49,7 @@ func parseSHA256File(path string) (string, string, error) {
 	return sha256, dbFilename, nil
 }
 
-func downloadDB(dbType string) error {
+func downloadDB(ctx context.Context, dbType string) error {
 	downloadArchivePath := getDBArchiveDownloadPath(dbType)
 	sha256FilePath := getDBSHA256DownloadPath(dbType)
 	dbUrl := getDBUrl(dbType)
@@ -63,13 +65,13 @@ func downloadDB(dbType string) error {
 	}
 
 	log.Infof("Downloading DB file, path=%s", downloadArchivePath)
-	if err := file.DownloadFile(dbUrl, downloadArchivePath); err != nil {
+	if err := file.DownloadFile(ctx, dbUrl, downloadArchivePath); err != nil {
 		return err
 	}
 	log.Infof("Downloaded DB file, path=%s", downloadArchivePath)
 
 	log.Infof("Downloading sha256 file, path=%s", sha256FilePath)
-	if err := file.DownloadFile(dbSha256Url, sha256FilePath); err != nil {
+	if err := file.DownloadFile(ctx, dbSha256Url, sha256FilePath); err != nil {
 		return err
 	}
 	log.Infof("Downloaded sha256 file, path=%s", sha256FilePath)
@@ -79,9 +81,13 @@ func downloadDB(dbType string) error {
 		return err
 	}
 
-	if err = file.ValidateFileSha256(downloadArchivePath, sha256); err != nil {
+	hasher := hash.NewSHA256Hasher()
+	if b, err := hasher.VerifyFile(downloadArchivePath, sha256); err != nil {
 		return err
+	} else if !b {
+		return fmt.Errorf("checksum mismatch for archive %s", downloadArchivePath)
 	}
+
 	log.Infof("Checksum validated for archive %s", downloadArchivePath)
 
 	log.Infof("Extracting file %s from archive %s", extractDBFilename, downloadArchivePath)
@@ -114,16 +120,16 @@ func dbFileExists(dbType string) bool {
 	return true
 }
 
-func DownloadCountryDB() error {
-	return downloadDB(constants.DBTypeCountry)
+func DownloadCountryDB(ctx context.Context) error {
+	return downloadDB(ctx, constants.DBTypeCountry)
 }
 
-func DownloadCityDB() error {
-	return downloadDB(constants.DBTypeCity)
+func DownloadCityDB(ctx context.Context) error {
+	return downloadDB(ctx, constants.DBTypeCity)
 }
 
-func DownloadASNDB() error {
-	return downloadDB(constants.DBTypeASN)
+func DownloadASNDB(ctx context.Context) error {
+	return downloadDB(ctx, constants.DBTypeASN)
 }
 
 func checkAllDBFilesExist() bool {
@@ -133,10 +139,12 @@ func checkAllDBFilesExist() bool {
 func DownloadAllDB() {
 	log.Infof("Downloading all DB files")
 
+	ctx := context.Background()
+
 	errors := []error{
-		DownloadCountryDB(),
-		DownloadCityDB(),
-		DownloadASNDB(),
+		DownloadCountryDB(ctx),
+		DownloadCityDB(ctx),
+		DownloadASNDB(ctx),
 	}
 	for _, err := range errors {
 		if err != nil {
