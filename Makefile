@@ -15,14 +15,27 @@ NC=\033[0m
 
 .DEFAULT_GOAL := help
 
-.PHONY: api-up
-api-up: ## Start API (dev)
+.PHONY: init
+init: ## Initialize the project
+	$(MAKE) install-golangci-lint
+	$(MAKE) install-pre-commit
+	go mod download
+
+.PHONY: install-golangci-lint
+install-golangci-lint: ## Install golangci-lint
+ifeq (, $(shell which golangci-lint))
+	@echo "Installing golangci-lint..."
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
+endif
+
+.PHONY: install-pre-commit
+install-pre-commit: ## Install pre-commit
+	pre-commit install
+
+.PHONY: dev
+dev: ## Start API (dev)
 	go mod tidy
 	${DOCKER_COMPOSE_PREFIX} up api
-
-.PHONY: api-down
-api-down: ## Stop API (dev)
-	${DOCKER_COMPOSE_PREFIX} rm -fsv api
 
 .PHONY: test
 test: ## Run tests
@@ -38,11 +51,11 @@ prod-up: ## start prod API
 	$(MAKE) docker-build
 	docker compose up
 
-.PHONY: docker-build
-docker-build: ## Build docker image
-	docker build -t hibare/go-geo-ip . 
+.PHONY: build
+build: ## Build docker image
+	docker build -t hibare/go-geo-ip .
 
 .PHONY: help
 help: ## Disply this help
 		echo -e "\n$(BBLUE)GoGeoIP: IP Geolocation Service$(NC)\n"
-		@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-18s$(NC)%s\n", $$1, $$2}'
+		@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-30s$(NC)%s\n", $$1, $$2}'
