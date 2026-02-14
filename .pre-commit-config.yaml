@@ -30,6 +30,7 @@ repos:
     hooks:
       - id: go-mod-tidy
       - id: go-fmt
+      - id: go-build-repo-mod
       - id: golangci-lint-mod
         args: [--fix]
       - id: go-test-mod
