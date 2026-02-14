@@ -1,11 +1,12 @@
 {
-    "cSpell.words": [
-        "AUTOUPDATE",
-        "geoip",
-        "hibare",
-        "logrus",
-        "maxmind",
-        "mmdb",
-        "sirupsen"
-    ]
+  "cSpell.words": [
+    "AUTOUPDATE",
+    "geoip",
+    "golangci",
+    "hibare",
+    "logrus",
+    "maxmind",
+    "mmdb",
+    "sirupsen"
+  ]
 }
