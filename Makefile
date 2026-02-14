@@ -56,6 +56,6 @@ build: ## Build docker image
 	docker build -t hibare/go-geo-ip .
 
 .PHONY: help
-help: ## Disply this help
+help: ## Display this help
 		echo -e "\n$(BBLUE)GoGeoIP: IP Geolocation Service$(NC)\n"
 		@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-30s$(NC)%s\n", $$1, $$2}'

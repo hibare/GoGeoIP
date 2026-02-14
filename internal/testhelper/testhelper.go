@@ -43,7 +43,9 @@ func LoadTestDB() error {
 		if err != nil {
 			return err
 		}
-		defer src.Close()
+		defer func() {
+			_ = src.Close()
+		}()
 
 		// Create the destination file
 		destFile := filepath.Join(constants.AssetDir, filepath.Base(sourceFile))
@@ -51,7 +53,9 @@ func LoadTestDB() error {
 		if err != nil {
 			return err
 		}
-		defer dest.Close()
+		defer func() {
+			_ = dest.Close()
+		}()
 
 		// Copy the contents from the source file to the destination file
 		_, err = io.Copy(dest, src)

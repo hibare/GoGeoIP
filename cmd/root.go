@@ -3,17 +3,19 @@ package cmd
 import (
 	"os"
 
-	"github.com/spf13/cobra"
-
-	"github.com/hibare/GoGeoIP/cmd/api"
-	"github.com/hibare/GoGeoIP/cmd/api/keys"
+	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/hibare/GoGeoIP/cmd/db"
-	"github.com/hibare/GoGeoIP/cmd/geoip"
+	"github.com/hibare/GoGeoIP/cmd/lookup"
+	"github.com/hibare/GoGeoIP/cmd/server"
 	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
+	"github.com/spf13/cobra"
 )
 
 var Version = "0.0.0"
+
+var (
+	ConfigPath string
+)
 
 var rootCmd = &cobra.Command{
 	Use:     "go_geo_ip",
@@ -29,26 +31,20 @@ func Execute() {
 	}
 }
 
-func ScheduleBackgroundJobs() {
-	// Schedule regular DB update job
-	go maxmind.RunDBDownloadJob()
-}
-
 func init() {
+	// Add global flags
+	rootCmd.PersistentFlags().StringVarP(&ConfigPath, "config", "c", "", "Path to config file")
+
+	// Add subcommands
 	rootCmd.AddCommand(db.DBCmd)
-	rootCmd.AddCommand(geoip.GeoIPCmd)
-	rootCmd.AddCommand(api.ServeCmd)
-	rootCmd.AddCommand(keys.KeysCmd)
+	rootCmd.AddCommand(lookup.LookupCmd)
+	rootCmd.AddCommand(server.ServeCmd)
 
-	config.Load()
-
-	initFuncs := []func(){
-		ScheduleBackgroundJobs,
+	// Load config with context
+	ctx := rootCmd.Context()
+	if _, err := config.Load(ctx, ConfigPath); err != nil {
+		os.Exit(1)
 	}
 
-	if !config.Current.Util.IsDev {
-		initFuncs = append(initFuncs, maxmind.DownloadAllDB)
-	}
-
-	cobra.OnInitialize(initFuncs...)
+	cobra.OnInitialize(commonLogger.InitDefaultLogger)
 }

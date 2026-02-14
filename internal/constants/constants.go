@@ -3,15 +3,10 @@ package constants
 import (
 	"errors"
 	"fmt"
-	"time"
 )
 
 const (
-	AssetDir                    = "./data"
-	DefaultAPIListenAddr        = "0.0.0.0"
-	DefaultAPIListenPort        = 5000
-	DefaultDBAutoUpdate         = true
-	DefaultDBAutoUpdateInterval = 24 * time.Hour
+	AssetDir = "./data"
 )
 
 var (

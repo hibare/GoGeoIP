@@ -1,0 +1,38 @@
+# GoGeoIP Configuration File
+# Copy this file to config.yaml and update with your values
+
+server:
+  # Address to listen on (default: 0.0.0.0)
+  listen_addr: 0.0.0.0
+
+  # Port to listen on (default: 5000)
+  listen_port: 5000
+
+  # API keys for authentication (comma-separated)
+  api_keys: "key1,key2,key3"
+
+  # Path to asset directory for GeoIP databases (default: ./data)
+  asset_dir_path: ./data
+
+  # Enable development mode (default: false)
+  is_dev: false
+
+maxmind:
+  # MaxMind license key for downloading GeoIP databases
+  # Get your key from: https://www.maxmind.com/en/accounts/current/license-key
+  license_key: "YOUR_MAXMIND_LICENSE_KEY"
+
+  # Enable automatic database updates (default: true)
+  autoupdate: true
+
+  # Update interval in hours (default: 24h)
+  # Examples: 24h, 48h, 168h (1 week)
+  autoupdate_interval: 24h
+
+logger:
+  # Log level: DEBUG, INFO, WARN, ERROR (default: INFO)
+  level: INFO
+
+  # Log output mode: PRETTY or JSON (default: PRETTY)
+  # Use PRETTY for development, JSON for production
+  mode: PRETTY
