@@ -112,7 +112,6 @@ func (c *Client) downloadDB(ctx context.Context, dbType DBType) error {
 	if err != nil {
 		return err
 	}
-	// ExtractFileFromTarGz returns the path where it extracted the file.
 
 	slog.Info("Loading new DB file", "path", finalDBPath)
 	_ = os.Remove(finalDBPath) // Remove old DB file

@@ -143,7 +143,6 @@ var ServeCmd = &cobra.Command{
 		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Server.AssetDirPath)
 
 		// Download DB if in production or missing
-		// This logic was previously in root.go
 		if !config.Current.Server.IsDev {
 			if err := mmClient.DownloadAllDB(); err != nil {
 				return err

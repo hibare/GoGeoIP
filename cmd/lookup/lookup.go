@@ -10,10 +10,11 @@ import (
 )
 
 var LookupCmd = &cobra.Command{
-	Use:   "lookup <ip>",
-	Short: "Lookup Geo information for an IP",
-	Long:  "Lookup geographic information for a given IP address using MaxMind GeoIP databases",
-	Args:  cobra.ExactArgs(1),
+	Use:     "lookup <ip>",
+	Short:   "Lookup Geo information for an IP",
+	Long:    "Lookup geographic information for a given IP address using MaxMind GeoIP databases",
+	Args:    cobra.ExactArgs(1),
+	Aliases: []string{"gogeoip"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ip := args[0]
 

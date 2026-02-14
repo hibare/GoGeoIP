@@ -70,7 +70,6 @@ func (c *Client) Load() error {
 			return fmt.Errorf("%w: type=%s path=%s err=%w", ErrDBOpenFailed, t, path, err)
 		}
 
-		// Close existing reader if any
 		if oldReader, ok := c.readers[t]; ok && oldReader != nil {
 			_ = oldReader.Close()
 		}
