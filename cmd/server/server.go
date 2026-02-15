@@ -156,7 +156,7 @@ var ServeCmd = &cobra.Command{
 
 		// Schedule background updates
 		if config.Current.MaxMind.AutoUpdate {
-			go mmClient.RunDBDownloadJob()
+			go mmClient.RunDBDownloadJob(ctx)
 		}
 
 		// Create and initialize server

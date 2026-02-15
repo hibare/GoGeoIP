@@ -17,14 +17,19 @@ import (
 const minSHA256FileParts = 2
 
 // RunDBDownloadJob starts the background job for downloading databases.
-func (c *Client) RunDBDownloadJob() {
+func (c *Client) RunDBDownloadJob(ctx context.Context) {
 	ticker := time.NewTicker(c.config.AutoUpdateInterval)
-	slog.Info("Scheduling DB update job")
+	slog.InfoContext(ctx, "Scheduling DB update job")
 
 	for {
-		<-ticker.C
-		if err := c.DownloadAllDB(); err != nil {
-			slog.Error("Background DB update failed", "error", err)
+		select {
+		case <-ctx.Done():
+			slog.InfoContext(ctx, "Stopping DB update job")
+			return
+		case <-ticker.C:
+			if err := c.DownloadAllDB(); err != nil {
+				slog.ErrorContext(ctx, "Background DB update failed", "error", err)
+			}
 		}
 	}
 }

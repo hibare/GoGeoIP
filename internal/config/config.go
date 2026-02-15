@@ -224,7 +224,7 @@ func Load(ctx context.Context, configPath string) (*Config, error) {
 	commonLogger.InitLogger(&cfg.Logger.Level, &cfg.Logger.Mode)
 
 	// Create asset dir
-	if err := os.MkdirAll(cfg.Server.AssetDirPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(cfg.Server.AssetDirPath, 0755); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrAssetDirCreation, err)
 	}
 

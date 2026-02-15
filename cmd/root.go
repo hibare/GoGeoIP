@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"log/slog"
 	"os"
 
 	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
@@ -43,6 +44,7 @@ func init() {
 	// Load config with context
 	ctx := rootCmd.Context()
 	if _, err := config.Load(ctx, ConfigPath); err != nil {
+		slog.Error("Failed to load config", "error", err)
 		os.Exit(1)
 	}
 

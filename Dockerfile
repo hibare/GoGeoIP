@@ -32,7 +32,7 @@ FROM alpine
 # ensure consistent shell in final stage too
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
-ENV API_LISTEN_ADDR=0.0.0.0
+ENV SERVER_LISTEN_ADDR=0.0.0.0
 
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 

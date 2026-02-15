@@ -10,8 +10,8 @@ import (
 // Country looks up country information for an IP.
 func (c *Client) Country(ip net.IP) (*geoip2.Country, error) {
 	c.mu.RLock()
+	defer c.mu.RUnlock()
 	reader, ok := c.readers[DBTypeCountry]
-	c.mu.RUnlock()
 
 	if !ok || reader == nil {
 		return nil, ErrCountryDBNotLoaded
@@ -22,8 +22,8 @@ func (c *Client) Country(ip net.IP) (*geoip2.Country, error) {
 // City looks up city information for an IP.
 func (c *Client) City(ip net.IP) (*geoip2.City, error) {
 	c.mu.RLock()
+	defer c.mu.RUnlock()
 	reader, ok := c.readers[DBTypeCity]
-	c.mu.RUnlock()
 
 	if !ok || reader == nil {
 		return nil, ErrCityDBNotLoaded
@@ -34,8 +34,8 @@ func (c *Client) City(ip net.IP) (*geoip2.City, error) {
 // ASN looks up ASN information for an IP.
 func (c *Client) ASN(ip net.IP) (*geoip2.ASN, error) {
 	c.mu.RLock()
+	defer c.mu.RUnlock()
 	reader, ok := c.readers[DBTypeASN]
-	c.mu.RUnlock()
 
 	if !ok || reader == nil {
 		return nil, ErrASNDBNotLoaded
