@@ -47,13 +47,13 @@ To use GoGeoIP, you require MaxMind license key to download lite databases. Head
 ### Docker run
 
 ```shell
-docker run -it -p 5000:5000 -e MAXMIND_LICENSE_KEY=<LICENSE_KEY> -e SERVER_LISTEN_ADDR=0.0.0.0 -e API_KEYS=test-key hibare/go-geo-ip
+docker run -it -p 5000:5000 -e GOGEOIP_MAXMIND_LICENSE_KEY=<LICENSE_KEY> -e GOGEOIP_SERVER_LISTEN_ADDR=0.0.0.0 -e GOGEOIP_API_KEYS=test-key hibare/go-geo-ip
 ```
 
 Replace `<LICENSE_KEY>` with the license key from MaxMind.
 Replace `test-key` with randomly generated API key. This is used to authenticate all IP lookup rest calls.
 
-```
+```txt
 INFO[0000] Loaded config
 INFO[0000] Downloading all DB files
 INFO[0000] Downloading DB file, path=/tmp/GeoLite2-Country.tar.gz
@@ -108,47 +108,47 @@ docker compose up
 1. Check health
    `[GET]` `/api/v1/health`
 
-```shell
-❯ curl http://127.0.0.1:5000/api/v1/health
-```
+   ```shell
+   ❯ curl http://127.0.0.1:5000/api/v1/health
+   ```
 
-```json
-{ "ok": true }
-```
+   ```json
+   { "ok": true }
+   ```
 
 2. IP Geo
    `[GET]` `/api/v1/ip/{lookup_ip}`
 
-```shell
-❯ curl -H "Authorization: test-key" http://127.0.0.1:5000/api/v1/ip/8.8.8.8
-```
+   ```shell
+   ❯ curl -H "Authorization: test-key" http://127.0.0.1:5000/api/v1/ip/8.8.8.8
+   ```
 
 3. What is My IP
    `[GET]` `/api/v1/ip/`
 
-```shell
-❯ curl -H http://127.0.0.1:5000/api/v1/ip/
-```
+   ```shell
+   ❯ curl -H http://127.0.0.1:5000/api/v1/ip/
+   ```
 
-```json
-{
-  "city": "",
-  "country": "United States",
-  "continent": "North America",
-  "iso_country_code": "US",
-  "iso_continent_code": "NA",
-  "is_anonymous_proxy": false,
-  "is_satellite_provider": false,
-  "timezone": "America/Chicago",
-  "latitude": 37.751,
-  "longitude": -97.822,
-  "asn": 15169,
-  "organization": "GOOGLE",
-  "ip": "8.8.8.8"
-}
-```
+   ```json
+   {
+     "city": "",
+     "country": "United States",
+     "continent": "North America",
+     "iso_country_code": "US",
+     "iso_continent_code": "NA",
+     "is_anonymous_proxy": false,
+     "is_satellite_provider": false,
+     "timezone": "America/Chicago",
+     "latitude": 37.751,
+     "longitude": -97.822,
+     "asn": 15169,
+     "organization": "GOOGLE",
+     "ip": "8.8.8.8"
+   }
+   ```
 
-## Cli
+## CLI
 
 GoGeoIP also has cli commands for quick actions. Binary is `go_geo_ip`.
 
@@ -158,7 +158,7 @@ For docker containers prefix all commands with `docker exec -it {container_name}
 ❯ go_geo_ip -h
 ```
 
-```
+```shell
 API to fetch Geo information for an IP
 
 Usage:
@@ -167,9 +167,7 @@ Usage:
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
   db          IP DB related commands
-  geoip       Lookup Geo information for an IP
-  help        Help about any command
-  keys        Manage API Keys
+  lookup      Lookup Geo information for an IP
   serve       Start API Server
 
 Flags:
@@ -191,10 +189,10 @@ Use "go_geo_ip [command] --help" for more information about a command.
 ❯ go_geo_ip db download
 ```
 
-### List API Keys
+### Lookup IP
 
 ```shell
-❯ go_geo_ip keys list
+❯ go_geo_ip lookup ip 8.8.8.8
 ```
 
 ### Version
@@ -205,14 +203,18 @@ Use "go_geo_ip [command] --help" for more information about a command.
 
 ## Environment Variables
 
-| Variable               | Description                                          | Required | Default Value                 | Value Type                      |
-| ---------------------- | ---------------------------------------------------- | -------- | ----------------------------- | ------------------------------- |
-| API_LISTEN_ADDR        | IP address to bind API server                        | No       | 0.0.0.0                       | string                          |
-| API_LISTEN_PORT        | Port to listen                                       | No       | 5000                          | int                             |
-| API_KEYS               | Comma separated API keys to authenticated REST calls | No       | Auto generated during runtime | comma separated string          |
-| DB_LICENSE_KEY         | MaxMind License key                                  | Yes      | -                             | string                          |
-| DB_AUTOUPDATE          | Flag to enable/disable DB auto-update                | No       | true                          | boolean                         |
-| DB_AUTOUPDATE_INTERVAL | Auto update interval.                                | No       | 24 Hours                      | Time duration (ex: 24h, 1h, 6h) |
+| Variable                            | Description                                          | Required | Default Value                 | Value Type                      |
+| ----------------------------------- | ---------------------------------------------------- | -------- | ----------------------------- | ------------------------------- |
+| GOGEOIP_SERVER_LISTEN_ADDR          | IP address to bind API server                        | No       | 0.0.0.0                       | string                          |
+| GOGEOIP_SERVER_LISTEN_PORT          | Port to listen                                       | No       | 5000                          | int                             |
+| GOGEOIP_API_KEYS                    | Comma separated API keys to authenticated REST calls | No       | Auto generated during runtime | comma separated string          |
+| GOGEOIP_ASSET_DIR_PATH              | Path to store MaxMind database files                 | No       | ./data                        | string                          |
+| GOGEOIP_IS_DEV                      | Run in development mode (skip DB download)           | No       | false                         | boolean                         |
+| GOGEOIP_LOG_LEVEL                   | Log level (debug, info, warn, error)                 | No       | info                          | string                          |
+| GOGEOIP_LOG_MODE                    | Log mode (json, pretty)                              | No       | pretty                        | string                          |
+| GOGEOIP_MAXMIND_LICENSE_KEY         | MaxMind License key                                  | Yes      | -                             | string                          |
+| GOGEOIP_MAXMIND_AUTOUPDATE          | Flag to enable/disable DB auto-update                | No       | true                          | boolean                         |
+| GOGEOIP_MAXMIND_AUTOUPDATE_INTERVAL | Auto update interval.                                | No       | 24 Hours                      | Time duration (ex: 24h, 1h, 6h) |
 
 ## Contributing
 
