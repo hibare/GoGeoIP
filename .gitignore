@@ -1,12 +1,5 @@
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
-
-# Project
-tmp
-*.env
-_volumes
-data
 
 # Binaries for programs and plugins
 *.exe
@@ -14,15 +7,92 @@ data
 *.dll
 *.so
 *.dylib
+Axon
 
 # Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+coverage.out
+coverage.html
+*.coverprofile
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
 # Go workspace file
 go.work
+go.work.sum
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files / directories
+tmp/
+tmp_*
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+data/
+
+# Build artifacts
+bin/
+dist/
+build/
+cmd/server/static/*
+!cmd/server/static/.gitkeep
+
+# Docker volumes
+.volumes/
+volumes/
+
+# IDE / Editor directories
+.idea/
+*.iml
+.fleet/
+.project
+.classpath
+.settings/
+
+# Config files (should be templated)
+.ignored/
+config.yaml
+config.yml
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# Log files
+*.log
+logs/
+
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Test artifacts
+testdata/output/
+*.test.db
+
+# Debug files
+debug
+__debug_bin
+dlv
+
+# Certificates
+certs/
+
+# Helm charts
+charts/*/charts/
+Chart.lock
+charts/*/Chart.lock

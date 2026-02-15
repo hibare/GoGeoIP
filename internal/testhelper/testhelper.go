@@ -43,21 +43,24 @@ func LoadTestDB() error {
 		if err != nil {
 			return err
 		}
-		defer src.Close()
 
 		// Create the destination file
 		destFile := filepath.Join(constants.AssetDir, filepath.Base(sourceFile))
 		dest, err := os.Create(destFile)
 		if err != nil {
+			_ = src.Close()
 			return err
 		}
-		defer dest.Close()
 
 		// Copy the contents from the source file to the destination file
 		_, err = io.Copy(dest, src)
 		if err != nil {
+			_ = dest.Close()
+			_ = src.Close()
 			return err
 		}
+		_ = dest.Close()
+		_ = src.Close()
 	}
 
 	return nil

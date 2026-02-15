@@ -11,5 +11,5 @@ var DBCmd = &cobra.Command{
 }
 
 func init() {
-	DBCmd.AddCommand(dBDowloadCmd)
+	DBCmd.AddCommand(dBDownloadCmd)
 }

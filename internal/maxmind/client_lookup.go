@@ -4,54 +4,60 @@ import (
 	"net"
 
 	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/oschwald/geoip2-golang"
 )
 
-type IPCountry struct {
-	IP                  string `json:"ip"`
-	Country             string `json:"country"`
-	Continent           string `json:"continent"`
-	ISOCountryCode      string `json:"iso_country_code"`
-	ISOContinentCode    string `json:"iso_continent_code"`
-	IsAnonymousProxy    bool   `json:"is_anonymous_proxy"`
-	IsSatelliteProvider bool   `json:"is_satellite_provider"`
+// Country looks up country information for an IP.
+func (c *Client) Country(ip net.IP) (*geoip2.Country, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	reader, ok := c.readers[DBTypeCountry]
+
+	if !ok || reader == nil {
+		return nil, ErrCountryDBNotLoaded
+	}
+	return reader.Country(ip)
 }
 
-type IPCity struct {
-	IP   string `json:"ip"`
-	City string `json:"city"`
-	IPCountry
-	Timezone  string  `json:"timezone"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+// City looks up city information for an IP.
+func (c *Client) City(ip net.IP) (*geoip2.City, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	reader, ok := c.readers[DBTypeCity]
+
+	if !ok || reader == nil {
+		return nil, ErrCityDBNotLoaded
+	}
+	return reader.City(ip)
 }
 
-type IPASN struct {
-	IP           string `json:"ip"`
-	ASN          uint   `json:"asn"`
-	Organization string `json:"organization"`
+// ASN looks up ASN information for an IP.
+func (c *Client) ASN(ip net.IP) (*geoip2.ASN, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	reader, ok := c.readers[DBTypeASN]
+
+	if !ok || reader == nil {
+		return nil, ErrASNDBNotLoaded
+	}
+	return reader.ASN(ip)
 }
 
-type GeoIP struct {
-	IPCity
-	IPASN
-	IP     string `json:"ip"`
-	Remark string `json:"remark,omitempty"`
-}
-
-func IP2Country(ip string) (IPCountry, error) {
+// IP2Country looks up country information for an IP address.
+func (c *Client) IP2Country(ipStr string) (IPCountry, error) {
 	ipCountry := IPCountry{}
 
-	parsedIP := net.ParseIP(ip)
+	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
 		return ipCountry, constants.ErrInvalidIP
 	}
 
-	record, err := GetDB(constants.DBTypeCountry).Country(parsedIP)
+	record, err := c.Country(parsedIP)
 	if err != nil {
 		return ipCountry, err
 	}
 
-	ipCountry.IP = ip
+	ipCountry.IP = ipStr
 	ipCountry.Continent = record.Continent.Names["en"]
 	ipCountry.Country = record.Country.Names["en"]
 	ipCountry.ISOContinentCode = record.Continent.Code
@@ -62,20 +68,21 @@ func IP2Country(ip string) (IPCountry, error) {
 	return ipCountry, nil
 }
 
-func IP2City(ip string) (IPCity, error) {
+// IP2City looks up city information for an IP address.
+func (c *Client) IP2City(ipStr string) (IPCity, error) {
 	ipCity := IPCity{}
 
-	parsedIP := net.ParseIP(ip)
+	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
 		return ipCity, constants.ErrInvalidIP
 	}
 
-	record, err := GetDB(constants.DBTypeCity).City(parsedIP)
+	record, err := c.City(parsedIP)
 	if err != nil {
 		return ipCity, err
 	}
 
-	ipCity.IP = ip
+	ipCity.IP = ipStr
 	ipCity.City = record.City.Names["en"]
 	ipCity.Timezone = record.Location.TimeZone
 	ipCity.Latitude = record.Location.Latitude
@@ -90,37 +97,39 @@ func IP2City(ip string) (IPCity, error) {
 	return ipCity, nil
 }
 
-func IP2ASN(ip string) (IPASN, error) {
+// IP2ASN looks up ASN information for an IP address.
+func (c *Client) IP2ASN(ipStr string) (IPASN, error) {
 	ipAsn := IPASN{}
 
-	parsedIP := net.ParseIP(ip)
+	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
 		return ipAsn, constants.ErrInvalidIP
 	}
 
-	record, err := GetDB(constants.DBTypeASN).ASN(parsedIP)
+	record, err := c.ASN(parsedIP)
 	if err != nil {
 		return ipAsn, err
 	}
 
-	ipAsn.IP = ip
+	ipAsn.IP = ipStr
 	ipAsn.ASN = record.AutonomousSystemNumber
 	ipAsn.Organization = record.AutonomousSystemOrganization
 
 	return ipAsn, nil
 }
 
-func IP2Geo(ip string) (GeoIP, error) {
+// IP2Geo looks up all geographic information for an IP address.
+func (c *Client) IP2Geo(ipStr string) (GeoIP, error) {
 	geoIP := GeoIP{
-		IP: ip,
+		IP: ipStr,
 	}
 
-	ipCity, err := IP2City(ip)
+	ipCity, err := c.IP2City(ipStr)
 	if err != nil {
 		return geoIP, err
 	}
 
-	ipAsn, err := IP2ASN(ip)
+	ipAsn, err := c.IP2ASN(ipStr)
 	if err != nil {
 		return geoIP, err
 	}
