@@ -18,7 +18,7 @@ var LookupCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ip := args[0]
 
-		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Server.AssetDirPath)
+		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Core.DataDir)
 		if err := mmClient.Load(); err != nil {
 			return fmt.Errorf("failed to load MaxMind databases: %w", err)
 		}

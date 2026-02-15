@@ -1,6 +1,18 @@
 # GoGeoIP Configuration File
 # Copy this file to config.yaml and update with your values
 
+# Core configuration
+core:
+  # Application environment: production, development, testing (default: production)
+  environment: production
+
+  # Secret key for JWT signing (auto-generated if not provided)
+  secret_key: ""
+
+  # Data directory for GeoIP databases (default: ./data)
+  data_dir: ./data
+
+# Server configuration
 server:
   # Address to listen on (default: 0.0.0.0)
   listen_addr: 0.0.0.0
@@ -8,15 +20,47 @@ server:
   # Port to listen on (default: 5000)
   listen_port: 5000
 
+  # Base URL for the server (e.g., https://example.com)
+  # Used for generating URLs in responses
+  base_url: http://localhost:5000
+
+  # HTTP timeouts (default: 15s)
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+  wait_timeout: 15s
+  request_timeout: 60s
+
+  # SSL certificate paths (leave empty for HTTP only)
+  # cert_file: /path/to/cert.pem
+  # key_file: /path/to/key.pem
+
   # API keys for authentication (comma-separated)
   api_keys: "key1,key2,key3"
 
-  # Path to asset directory for GeoIP databases (default: ./data)
-  asset_dir_path: ./data
+# Database configuration (optional)
+# Leave empty for in-memory storage
+db:
+  # Database type: postgres
+  type: postgres
 
-  # Enable development mode (default: false)
-  is_dev: false
+  # Database credentials
+  username: ""
+  password: ""
 
+  # Database host and port (default: 127.0.0.1:5432)
+  host: 127.0.0.1
+  port: 5432
+
+  # Database name (default: tasks)
+  name: tasks
+
+  # Connection pool settings (optional)
+  # max_idle_conn: 5
+  # max_open_conn: 10
+  # conn_max_lifetime: 10m
+
+# MaxMind GeoIP configuration
 maxmind:
   # MaxMind license key for downloading GeoIP databases
   # Get your key from: https://www.maxmind.com/en/accounts/current/license-key
@@ -25,10 +69,11 @@ maxmind:
   # Enable automatic database updates (default: true)
   autoupdate: true
 
-  # Update interval in hours (default: 24h)
-  # Examples: 24h, 48h, 168h (1 week)
+  # Update interval (default: 24h)
+  # Examples: 6h, 12h, 24h, 48h, 168h (1 week)
   autoupdate_interval: 24h
 
+# Logger configuration
 logger:
   # Log level: DEBUG, INFO, WARN, ERROR (default: INFO)
   level: INFO
@@ -36,3 +81,21 @@ logger:
   # Log output mode: PRETTY or JSON (default: PRETTY)
   # Use PRETTY for development, JSON for production
   mode: PRETTY
+
+# OIDC Authentication (optional)
+# OIDC is enabled when issuer_url is set
+oidc:
+  # OIDC Issuer URL (e.g., https://accounts.google.com, https://github.com)
+  issuer_url: ""
+
+  # OIDC Client ID
+  client_id: ""
+
+  # OIDC Client Secret
+  client_secret: ""
+
+  # OIDC Scopes (default: openid, profile, email)
+  # scopes:
+  #   - openid
+  #   - profile
+  #   - email

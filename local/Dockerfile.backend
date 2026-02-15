@@ -1,0 +1,19 @@
+ARG GOLANG_VERSION=1.25
+
+FROM golang:${GOLANG_VERSION}-alpine
+
+# hadolint ignore=DL3018
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+# hadolint ignore=DL3062
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+ENV GOCACHE=/tmp/go-cache
+
+ENTRYPOINT ["air"]

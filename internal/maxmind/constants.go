@@ -1,25 +1,11 @@
-package constants
+package maxmind
 
-import (
-	"errors"
-	"fmt"
-)
-
-const (
-	AssetDir = "./data"
-)
-
-var (
-	ErrInvalidIP = errors.New("invalid IP")
-)
+import "fmt"
 
 const (
 	MaxMindDownloadPathQuery   = "/app/geoip_download?edition_id=%s&license_key=%s&suffix=%s"
 	DBArchiveDownloadSuffix    = "tar.gz"
 	DBSHA256FileDownloadSuffix = "tar.gz.sha256"
-	DBTypeCountry              = "GeoLite2-Country"
-	DBTypeCity                 = "GeoLite2-City"
-	DBTypeASN                  = "GeoLite2-ASN"
 	DBSuffix                   = "mmdb"
 )
 

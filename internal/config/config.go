@@ -5,101 +5,94 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"net"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
-	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/spf13/viper"
 )
 
-// ServerConfig holds API server-related configuration.
-type ServerConfig struct {
-	ListenAddr   string   `mapstructure:"listen_addr"`
-	ListenPort   int      `mapstructure:"listen_port"`
-	APIKeys      []string `mapstructure:"api_keys"`
-	AssetDirPath string   `mapstructure:"asset_dir_path"`
-	IsDev        bool     `mapstructure:"is_dev"`
+var (
+	// ErrSecretKeyEmpty indicates that the secret key is empty.
+	ErrSecretKeyEmpty = errors.New("secret key is empty")
+
+	// ErrDBLicenseKeyEmpty indicates that the database license key is empty.
+	ErrAssetDirEmpty = errors.New("asset directory cannot be empty")
+)
+
+// Environment represents the application environment.
+type Environment string
+
+const (
+	// EnvironmentProduction represents the production environment.
+	EnvironmentProduction Environment = "production"
+
+	// EnvironmentDevelopment represents the development environment.
+	EnvironmentDevelopment Environment = "development"
+
+	// EnvironmentTesting represents the testing environment.
+	EnvironmentTesting Environment = "testing"
+)
+
+const (
+	DefaultAssetDirPath = "./data"
+)
+
+type CoreConfig struct {
+	Environment Environment `mapstructure:"environment"`
+	SecretKey   string      `mapstructure:"secret_key"`
+	DataDir     string      `mapstructure:"data_dir"`
 }
 
-// GetAddr returns the API server's listen address in "host:port" format.
-func (s *ServerConfig) GetAddr() string {
-	return net.JoinHostPort(s.ListenAddr, strconv.Itoa(s.ListenPort))
-}
-
-// PostProcess performs post-processing on the server configuration.
-func (s *ServerConfig) PostProcess() {
+func (c *CoreConfig) PostProcess() {
 	// Resolve asset dir path to absolute path
-	absPath, err := filepath.Abs(s.AssetDirPath)
+	absPath, err := filepath.Abs(c.DataDir)
 	if err == nil {
-		s.AssetDirPath = absPath
+		c.DataDir = absPath
 	}
 }
 
-// Validate checks if the server configuration is valid.
-func (s *ServerConfig) Validate() error {
-	if s.ListenPort <= 0 || s.ListenPort > 65535 {
-		return ErrAPIListenPortInvalid
+func (c *CoreConfig) Validate() error {
+	if c.SecretKey == "" {
+		return ErrSecretKeyEmpty
 	}
-	if len(s.APIKeys) == 0 {
-		return ErrAPIKeysEmpty
-	}
-	if s.AssetDirPath == "" {
+
+	if c.DataDir == "" {
 		return ErrAssetDirEmpty
-	}
-	return nil
-}
-
-// LoggerConfig holds logger-related configuration.
-type LoggerConfig struct {
-	Level string `mapstructure:"level"`
-	Mode  string `mapstructure:"mode"`
-}
-
-// Validate checks if the logger configuration is valid.
-func (l *LoggerConfig) Validate() error {
-	if !commonLogger.IsValidLogLevel(l.Level) {
-		return ErrInvalidLogLevel
-	}
-	if !commonLogger.IsValidLogMode(l.Mode) {
-		return ErrInvalidLogMode
-	}
-	return nil
-}
-
-// MaxMindConfig holds MaxMind GeoIP database-related configuration.
-type MaxMindConfig struct {
-	LicenseKey         string        `mapstructure:"license_key"`
-	AutoUpdate         bool          `mapstructure:"auto_update"`
-	AutoUpdateInterval time.Duration `mapstructure:"auto_update_interval"`
-}
-
-// Validate checks if the MaxMind configuration is valid.
-func (m *MaxMindConfig) Validate() error {
-	if m.LicenseKey == "" {
-		return ErrMaxMindLicenseKeyEmpty
-	}
-	if m.AutoUpdate && m.AutoUpdateInterval <= 0 {
-		return ErrMaxMindAutoUpdateIntervalInvalid
 	}
 	return nil
 }
 
 // Config holds the entire application configuration.
 type Config struct {
+	Core    CoreConfig    `mapstructure:"core"`
 	Server  ServerConfig  `mapstructure:"server"`
+	DB      DBConfig      `mapstructure:"db"`
 	MaxMind MaxMindConfig `mapstructure:"maxmind"`
 	Logger  LoggerConfig  `mapstructure:"logger"`
+	OIDC    OIDCConfig    `mapstructure:"oidc"`
 }
 
 // Validate validates the entire configuration.
 func (c *Config) Validate() error {
+	// Skip DB validation if not configured
+	if c.DB.DBType != "" {
+		if err := c.DB.Validate(); err != nil {
+			return err
+		}
+	}
+
+	// Skip OIDC validation if not configured
+	if c.OIDC.IssuerURL != "" {
+		if err := c.OIDC.Validate(); err != nil {
+			return err
+		}
+	}
+
 	var vFuncs = []func() error{
+		c.Core.Validate,
 		c.MaxMind.Validate,
 		c.Server.Validate,
 		c.Logger.Validate,
@@ -116,6 +109,7 @@ func (c *Config) Validate() error {
 
 // PostProcess performs post-processing on the configuration.
 func (c *Config) PostProcess() {
+	c.Core.PostProcess()
 	c.Server.PostProcess()
 }
 
@@ -140,16 +134,36 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 
 	// Environment variable bindings.
 	envBindings := map[string]string{
+		"core.environment":             "CORE_ENVIRONMENT",
+		"core.secret_key":              "CORE_SECRET_KEY",
+		"core.data_dir":                "CORE_DATA_DIR",
+		"db.username":                  "DB_USERNAME",
+		"db.password":                  "DB_PASSWORD",
+		"db.host":                      "DB_HOST",
+		"db.port":                      "DB_PORT",
+		"db.name":                      "DB_NAME",
+		"db.max_idle_conn":             "DB_MAX_IDLE_CONN",
+		"db.max_open_conn":             "DB_MAX_OPEN_CONN",
+		"db.conn_max_lifetime":         "DB_CONN_MAX_LIFETIME",
 		"server.listen_addr":           "SERVER_LISTEN_ADDR",
 		"server.listen_port":           "SERVER_LISTEN_PORT",
+		"server.base_url":              "SERVER_BASE_URL",
+		"server.write_timeout":         "SERVER_WRITE_TIMEOUT",
+		"server.read_timeout":          "SERVER_READ_TIMEOUT",
+		"server.idle_timeout":          "SERVER_IDLE_TIMEOUT",
+		"server.wait_timeout":          "SERVER_WAIT_TIMEOUT",
+		"server.request_timeout":       "SERVER_REQUEST_TIMEOUT",
+		"server.cert_file":             "SERVER_CERT_FILE",
+		"server.key_file":              "SERVER_KEY_FILE",
 		"server.api_keys":              "API_KEYS",
-		"server.asset_dir_path":        "ASSET_DIR_PATH",
-		"server.is_dev":                "IS_DEV",
 		"logger.level":                 "LOG_LEVEL",
 		"logger.mode":                  "LOG_MODE",
 		"maxmind.license_key":          "MAXMIND_LICENSE_KEY",
 		"maxmind.auto_update":          "MAXMIND_AUTOUPDATE",
 		"maxmind.auto_update_interval": "MAXMIND_AUTOUPDATE_INTERVAL",
+		"oidc.issuer_url":              "OIDC_ISSUER_URL",
+		"oidc.client_id":               "OIDC_CLIENT_ID",
+		"oidc.client_secret":           "OIDC_CLIENT_SECRET",
 	}
 
 	for key, envVar := range envBindings {
@@ -162,16 +176,31 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	}
 
 	// Set default values.
+	v.SetDefault("core.environment", EnvironmentProduction)
+	v.SetDefault("core.data_dir", DefaultAssetDirPath)
+	v.SetDefault("db.host", DefaultDBHost)
+	v.SetDefault("db.port", DefaultDBPort)
+	v.SetDefault("db.name", DefaultDBName)
+	v.SetDefault("db.max_idle_conn", DefaultDBMaxIdleConn)
+	v.SetDefault("db.max_open_conn", DefaultDBMaxOpenConn)
+	v.SetDefault("db.conn_max_lifetime", DefaultDBConnMaxLifetime)
 	v.SetDefault("server.listen_addr", DefaultServerListenAddr)
 	v.SetDefault("server.listen_port", DefaultServerListenPort)
+	v.SetDefault("server.base_url", "http://localhost:5000")
+	v.SetDefault("server.read_timeout", DefaultServerReadTimeout)
+	v.SetDefault("server.write_timeout", DefaultServerWriteTimeout)
+	v.SetDefault("server.idle_timeout", DefaultServerIdleTimeout)
+	v.SetDefault("server.wait_timeout", DefaultServerWaitTimeout)
+	v.SetDefault("server.request_timeout", DefaultServerRequestTimeout)
 	v.SetDefault("server.api_keys", []string{uuid.New().String()})
-	v.SetDefault("server.asset_dir_path", constants.AssetDir)
-	v.SetDefault("server.is_dev", false)
 	v.SetDefault("logger.level", commonLogger.LogLevelInfo)
 	v.SetDefault("logger.mode", commonLogger.LogModePretty)
 	v.SetDefault("maxmind.license_key", "")
 	v.SetDefault("maxmind.auto_update", DefaultMaxMindAutoUpdate)
 	v.SetDefault("maxmind.auto_update_interval", DefaultMaxMindAutoUpdateInterval)
+	v.SetDefault("oidc.issuer_url", "")
+	v.SetDefault("oidc.client_id", "")
+	v.SetDefault("oidc.client_secret", "")
 
 	return v
 }
@@ -223,9 +252,9 @@ func Load(ctx context.Context, configPath string) (*Config, error) {
 	// Initialize logger.
 	commonLogger.InitLogger(&cfg.Logger.Level, &cfg.Logger.Mode)
 
-	// Create asset dir
-	if err := os.MkdirAll(cfg.Server.AssetDirPath, 0755); err != nil {
-		return nil, fmt.Errorf("%w: %w", ErrAssetDirCreation, err)
+	// Create data dir
+	if err := os.MkdirAll(cfg.Core.DataDir, 0755); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrDataDirCreation, err)
 	}
 
 	Current = cfg
