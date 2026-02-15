@@ -11,7 +11,6 @@ import (
 
 	"github.com/hibare/GoCommon/v2/pkg/crypto/hash"
 	"github.com/hibare/GoCommon/v2/pkg/file"
-	"github.com/hibare/GoGeoIP/internal/constants"
 )
 
 const minSHA256FileParts = 2
@@ -73,11 +72,11 @@ func (c *Client) downloadDB(ctx context.Context, dbType DBType) error {
 	}
 
 	tmpDir := os.TempDir()
-	archivePath := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, constants.DBArchiveDownloadSuffix))
-	sha256Path := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, constants.DBSHA256FileDownloadSuffix))
+	archivePath := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBArchiveDownloadSuffix))
+	sha256Path := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBSHA256FileDownloadSuffix))
 
-	dbURL := fmt.Sprintf(constants.MaxMindDownloadURL, dbType, c.config.LicenseKey, constants.DBArchiveDownloadSuffix)
-	sha256URL := fmt.Sprintf(constants.MaxMindDownloadURL, dbType, c.config.LicenseKey, constants.DBSHA256FileDownloadSuffix)
+	dbURL := fmt.Sprintf(MaxMindDownloadURL, dbType, c.config.LicenseKey, DBArchiveDownloadSuffix)
+	sha256URL := fmt.Sprintf(MaxMindDownloadURL, dbType, c.config.LicenseKey, DBSHA256FileDownloadSuffix)
 
 	finalDBPath := c.getDBPath(dbType)
 
@@ -146,7 +145,7 @@ func (c *Client) parseSHA256File(path string) (string, string, error) {
 	fileName := parts[1]
 
 	baseName := strings.Split(strings.Split(fileName, ".")[0], "_")[0]
-	dbFilename := fmt.Sprintf("%s.%s", baseName, constants.DBSuffix)
+	dbFilename := fmt.Sprintf("%s.%s", baseName, DBSuffix)
 
 	return sha256Sum, dbFilename, nil
 }

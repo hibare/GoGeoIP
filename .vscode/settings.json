@@ -3,8 +3,10 @@
     "AUTOUPDATE",
     "geoip",
     "golangci",
+    "healthcheck",
     "hibare",
     "logrus",
+    "mapstructure",
     "maxmind",
     "mmdb",
     "sirupsen"

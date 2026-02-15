@@ -1,10 +1,11 @@
 SHELL=/bin/bash
 
-UI := $(shell id -u)
-GID := $(shell id -g)
 MAKEFLAGS += -s
-GODOTENV_CMD_PATH = $$GOPATH/bin/godotenv
-DOCKER_COMPOSE_PREFIX = HOST_UID=${UID} HOST_GID=${GID} docker-compose -f docker-compose.dev.yml
+
+UID:=$(shell id -u)
+GID:=$(shell id -g)
+COMPOSE_CMD := HOST_UID=$(UID) HOST_GID=$(GID) docker compose -f compose.dev.yml
+VOLUMES_DIR := ./.volumes
 
 # Bold
 BCYAN=\033[1;36m
@@ -16,46 +17,45 @@ NC=\033[0m
 .DEFAULT_GOAL := help
 
 .PHONY: init
-init: ## Initialize the project
-	$(MAKE) install-golangci-lint
-	$(MAKE) install-pre-commit
-	go mod download
-
-.PHONY: install-golangci-lint
-install-golangci-lint: ## Install golangci-lint
-ifeq (, $(shell which golangci-lint))
-	@echo "Installing golangci-lint..."
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
-endif
-
-.PHONY: install-pre-commit
-install-pre-commit: ## Install pre-commit
+init: ## Initialize development environment
+	mkdir -p $(VOLUMES_DIR)
+	@echo -e "$(BCYAN)Initializing development environment...$(NC)"
+	$(MAKE) gen-certs
+	$(COMPOSE_CMD) build
 	pre-commit install
 
-.PHONY: dev
-dev: ## Start API (dev)
-	go mod tidy
-	${DOCKER_COMPOSE_PREFIX} up api
+.PHONY: gen-certs
+gen-certs: ## Generate self-signed certificates
+	@echo -e "$(BCYAN)Generating self-signed certificates...$(NC)"
+	mkdir -p certs
+	openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes -keyout certs/key.pem -out certs/cert.pem -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 
-.PHONY: test
-test: ## Run tests
-	go test ./... -cover
+.PHONY: deps
+deps: ## Start service dependencies (postgres, adminer, dex)
+	@echo -e "$(BCYAN)Starting service dependencies...$(NC)"
+	$(COMPOSE_CMD) up -d postgres adminer dex
+	@echo -e "$(BCYAN)Service dependencies started...$(NC)"
+
+.PHONY: backend
+backend: deps ## Run backend with hot reload
+	@echo -e "$(BCYAN)Running backend with hot reload...$(NC)"
+	$(COMPOSE_CMD) up api
+
+.PHONY: ui
+ui: backend ## Run UI with hot reload
+	@echo -e "$(BCYAN)Running UI with hot reload...$(NC)"
+	$(COMPOSE_CMD) up ui
+
+.PHONY: dev
+dev: ## Run full dev environment with hot reload
+	@echo -e "$(BCYAN)Running dev environment with hot reload...$(NC)"
+	$(COMPOSE_CMD) up
 
 .PHONY: clean
-clean: ## Cleanup
-	${DOCKER_COMPOSE_PREFIX} down
-	go mod tidy
-
-.PHONY: prod-up
-prod-up: ## start prod API
-	$(MAKE) docker-build
-	docker compose up
-
-.PHONY: build
-build: ## Build docker image
-	docker build -t hibare/go-geo-ip .
+clean: ## Clean up environment
+	@echo -e "$(BCYAN)Cleaning up environment...$(NC)"
+	$(COMPOSE_CMD) down -v --rmi local
 
 .PHONY: help
 help: ## Display this help
-		echo -e "\n$(BBLUE)GoGeoIP: IP Geolocation Service$(NC)\n"
-		@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-30s$(NC)%s\n", $$1, $$2}'
+		@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(BCYAN)%-18s$(NC)%s\n", $$1, $$2}'

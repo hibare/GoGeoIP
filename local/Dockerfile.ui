@@ -1,0 +1,16 @@
+ARG NODE_VERSION=25
+
+FROM node:${NODE_VERSION}-alpine
+
+WORKDIR /app
+
+# Copy dependency files first for layer caching
+COPY package.json pnpm-lock* ./
+
+# hadolint ignore=DL3016
+RUN npm install -g pnpm \
+    && pnpm install --frozen-lockfile
+
+EXPOSE 5173
+
+CMD ["pnpm", "run", "dev", "--host"]

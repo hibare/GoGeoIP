@@ -207,14 +207,23 @@ Use "go_geo_ip [command] --help" for more information about a command.
 | ----------------------------------- | ---------------------------------------------------- | -------- | ----------------------------- | ------------------------------- |
 | GOGEOIP_SERVER_LISTEN_ADDR          | IP address to bind API server                        | No       | 0.0.0.0                       | string                          |
 | GOGEOIP_SERVER_LISTEN_PORT          | Port to listen                                       | No       | 5000                          | int                             |
+| GOGEOIP_SERVER_BASE_URL             | Base URL for the server                              | No       | http://localhost:5000         | string                          |
+| GOGEOIP_JWT_SECRET                  | JWT secret for OIDC authentication                  | No*      | Auto generated                | string                          |
 | GOGEOIP_API_KEYS                    | Comma separated API keys to authenticated REST calls | No       | Auto generated during runtime | comma separated string          |
 | GOGEOIP_ASSET_DIR_PATH              | Path to store MaxMind database files                 | No       | ./data                        | string                          |
-| GOGEOIP_IS_DEV                      | Run in development mode (skip DB download)           | No       | false                         | boolean                         |
-| GOGEOIP_LOG_LEVEL                   | Log level (debug, info, warn, error)                 | No       | info                          | string                          |
-| GOGEOIP_LOG_MODE                    | Log mode (json, pretty)                              | No       | pretty                        | string                          |
+| GOGEOIP_IS_DEV                      | Run in development mode (skip DB download)          | No       | false                         | boolean                         |
+| GOGEOIP_LOG_LEVEL                   | Log level (debug, info, warn, error)                | No       | info                          | string                          |
+| GOGEOIP_LOG_MODE                    | Log mode (json, pretty)                             | No       | pretty                        | string                          |
 | GOGEOIP_MAXMIND_LICENSE_KEY         | MaxMind License key                                  | Yes      | -                             | string                          |
 | GOGEOIP_MAXMIND_AUTOUPDATE          | Flag to enable/disable DB auto-update                | No       | true                          | boolean                         |
-| GOGEOIP_MAXMIND_AUTOUPDATE_INTERVAL | Auto update interval.                                | No       | 24 Hours                      | Time duration (ex: 24h, 1h, 6h) |
+| GOGEOIP_MAXMIND_AUTOUPDATE_INTERVAL | Auto update interval                                | No       | 24 Hours                      | Time duration (ex: 24h, 1h, 6h) |
+| GOGEOIP_OIDC_ENABLED                | Enable OIDC authentication                          | No       | false                         | boolean                         |
+| GOGEOIP_OIDC_ISSUER_URL             | OIDC provider issuer URL                            | No**     | -                             | string                          |
+| GOGEOIP_OIDC_CLIENT_ID              | OIDC client ID                                      | No**     | -                             | string                          |
+| GOGEOIP_OIDC_CLIENT_SECRET          | OIDC client secret                                  | No**     | -                             | string                          |
+
+* Required when OIDC is enabled
+** Required when OIDC is enabled
 
 ## Contributing
 

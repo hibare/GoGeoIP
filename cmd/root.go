@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"os"
 
-	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/hibare/GoGeoIP/cmd/db"
 	"github.com/hibare/GoGeoIP/cmd/lookup"
+	"github.com/hibare/GoGeoIP/cmd/maxmind"
 	"github.com/hibare/GoGeoIP/cmd/server"
 	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/spf13/cobra"
@@ -38,6 +38,7 @@ func init() {
 
 	// Add subcommands
 	rootCmd.AddCommand(db.DBCmd)
+	rootCmd.AddCommand(maxmind.MaxmindCmd)
 	rootCmd.AddCommand(lookup.LookupCmd)
 	rootCmd.AddCommand(server.ServeCmd)
 
@@ -47,6 +48,4 @@ func init() {
 		slog.Error("Failed to load config", "error", err)
 		os.Exit(1)
 	}
-
-	cobra.OnInitialize(commonLogger.InitDefaultLogger)
 }

@@ -1,5 +1,14 @@
 package maxmind
 
+// DBType represents the type of MaxMind database.
+type DBType string
+
+const (
+	DBTypeCountry DBType = "GeoLite2-Country"
+	DBTypeCity    DBType = "GeoLite2-City"
+	DBTypeASN     DBType = "GeoLite2-ASN"
+)
+
 // IPCountry represents country information for an IP.
 type IPCountry struct {
 	IP                  string `json:"ip"`
