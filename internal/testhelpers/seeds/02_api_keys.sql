@@ -1,0 +1,39 @@
+-- Seed test API keys
+-- Simplified key hashes for testing
+INSERT INTO api_keys (
+    id,
+    user_id,
+    name,
+    key_hash,
+    state,
+    created_at,
+    updated_at
+)
+VALUES
+(
+    gen_random_uuid(),
+    '550e8400-e29b-41d4-a716-446655440001',
+    'test-key-1',
+    'test-key-hash-1',
+    'active',
+    now(),
+    now()
+),
+(
+    gen_random_uuid(),
+    '550e8400-e29b-41d4-a716-446655440002',
+    'test-key-2',
+    'test-key-hash-2',
+    'active',
+    now(),
+    now()
+),
+(
+    gen_random_uuid(),
+    '550e8400-e29b-41d4-a716-446655440001',
+    'inactive-key',
+    'inactive-key-hash',
+    'revoked',
+    now(),
+    now()
+);

@@ -74,6 +74,7 @@ func NewServer(ctx context.Context, cfg *config.Config, mm *maxmind.Client, db *
 
 // Init initializes the server with handlers, routes and middleware.
 func (s *Server) Init() error {
+	apiKeyHandler := handlers.NewAPIKeyHandler(s.db)
 	geoIPHandler := handlers.NewGeoIP(s.maxmind, s.cfg)
 	authHandler, err := handlers.NewAuth(s.ctx, s.cfg, s.db)
 	if err != nil {
@@ -109,6 +110,7 @@ func (s *Server) Init() error {
 				r.With(httpin.NewInput(handlers.LoginInput{})).Get("/login", authHandler.Login)
 				r.With(httpin.NewInput(handlers.CallbackInput{})).Get("/callback", authHandler.Callback)
 				r.Post("/logout", authHandler.Logout)
+				r.Get("/me", authHandler.Me)
 			})
 		})
 
@@ -116,6 +118,19 @@ func (s *Server) Init() error {
 		r.Group(func(r chi.Router) {
 			r.Use(middlewares.CookieAuthMiddleware)
 			r.Get("/ip/{ip}", geoIPHandler.GetGeoIP)
+			r.Get("/auth/me", authHandler.Me)
+
+			// api keys routes
+			r.Route("/api-keys", func(r chi.Router) {
+				r.Get("/", apiKeyHandler.ListAPIKeys)
+			})
+
+			r.Route("/api-key", func(r chi.Router) {
+				r.With(httpin.NewInput(handlers.APIKeyCreateInput{})).Post("/", apiKeyHandler.CreateAPIKey)
+				r.With(httpin.NewInput(handlers.APIKeyIDInput{})).Post("/{id}/revoke", apiKeyHandler.RevokeAPIKey)
+				r.With(httpin.NewInput(handlers.APIKeyIDInput{})).Delete("/{id}", apiKeyHandler.DeleteAPIKey)
+			})
+
 		})
 	})
 

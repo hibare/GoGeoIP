@@ -9,10 +9,9 @@ import (
 	"github.com/hibare/GoGeoIP/cmd/maxmind"
 	"github.com/hibare/GoGeoIP/cmd/server"
 	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/spf13/cobra"
 )
-
-var Version = "0.0.0"
 
 var (
 	ConfigPath string
@@ -22,7 +21,7 @@ var rootCmd = &cobra.Command{
 	Use:     "go_geo_ip",
 	Short:   "API to fetch Geo information for an IP",
 	Long:    "",
-	Version: Version,
+	Version: constants.Version,
 }
 
 func Execute() {

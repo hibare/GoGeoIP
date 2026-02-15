@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <div class="flex flex-col items-center justify-center space-y-4">
       <h1 class="text-3xl font-bold">IP Geolocation Lookup</h1>
-      <p class="text-muted-foreground">Your current IP information</p>
+      <p class="text-muted-foreground">Look up any IP address</p>
     </div>
 
     <Card class="w-full max-w-2xl mx-auto">
@@ -13,9 +13,11 @@
             type="text"
             placeholder="Enter IP address (e.g., 8.8.8.8)"
             class="flex-1"
+            :disabled="isLoading"
           />
           <Button type="submit" :disabled="isLoading">
-            <Search class="w-4 h-4 mr-2" />
+            <Loader2Icon v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+            <SearchIcon v-else class="w-4 h-4 mr-2" />
             Lookup
           </Button>
           <Button
@@ -24,19 +26,29 @@
             @click="handleMyIp"
             :disabled="isLoading"
           >
+            <Loader2Icon
+              v-if="isLoading && !result"
+              class="w-4 h-4 mr-2 animate-spin"
+            />
             My IP
           </Button>
         </form>
       </CardContent>
     </Card>
 
-    <div v-if="error" class="text-destructive text-center">{{ error }}</div>
+    <div v-if="isLoading" class="flex justify-center py-12">
+      <Loader2Icon class="h-8 w-8 animate-spin text-primary" />
+    </div>
 
-    <div v-if="result" class="grid gap-6 md:grid-cols-2">
+    <div v-else-if="error" class="text-destructive text-center">
+      {{ error }}
+    </div>
+
+    <div v-else-if="result" class="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle class="flex items-center gap-2">
-            <MapPin class="w-5 h-5" />
+            <MapPinIcon class="w-5 h-5" />
             Location
           </CardTitle>
         </CardHeader>
@@ -70,7 +82,7 @@
       <Card>
         <CardHeader>
           <CardTitle class="flex items-center gap-2">
-            <Network class="w-5 h-5" />
+            <NetworkIcon class="w-5 h-5" />
             Network
           </CardTitle>
         </CardHeader>
@@ -93,7 +105,7 @@
       <Card class="md:col-span-2">
         <CardHeader>
           <CardTitle class="flex items-center gap-2">
-            <Shield class="w-5 h-5" />
+            <ShieldIcon class="w-5 h-5" />
             Details
           </CardTitle>
         </CardHeader>
@@ -102,7 +114,7 @@
             <Badge
               :variant="result.is_anonymous_proxy ? 'destructive' : 'secondary'"
             >
-              <Satellite class="w-3 h-3 mr-1" />
+              <SatelliteIcon class="w-3 h-3 mr-1" />
               Anonymous Proxy: {{ result.is_anonymous_proxy ? "Yes" : "No" }}
             </Badge>
             <Badge
@@ -110,7 +122,7 @@
                 result.is_satellite_provider ? 'destructive' : 'secondary'
               "
             >
-              <Globe class="w-3 h-3 mr-1" />
+              <GlobeIcon class="w-3 h-3 mr-1" />
               Satellite: {{ result.is_satellite_provider ? "Yes" : "No" }}
             </Badge>
             <Badge variant="outline">
@@ -124,53 +136,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import {
-  Search,
-  MapPin,
-  Globe,
-  Network,
-  Shield,
-  Satellite,
+  SearchIcon,
+  Loader2Icon,
+  MapPinIcon,
+  GlobeIcon,
+  NetworkIcon,
+  ShieldIcon,
+  SatelliteIcon,
 } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import type { GeoIP, LookupHistory } from "@/types";
+import { useUserStore } from "@/store/auth";
+import { useHistoryStore } from "@/store/history";
+import type { GeoIP } from "@/types";
 import { getMyIp, lookupIp } from "@/apis/ip";
+
+const router = useRouter();
+const route = useRoute();
+const userStore = useUserStore();
+const historyStore = useHistoryStore();
 
 const ipInput = ref("");
 const isLoading = ref(false);
 const error = ref("");
 const result = ref<GeoIP | null>(null);
 
-const history = ref<LookupHistory[]>([]);
-
-onMounted(() => {
-  handleMyIp();
+onMounted(async () => {
+  const queryIp = route.query.ip as string;
+  if (queryIp) {
+    ipInput.value = queryIp;
+    await handleLookup();
+  } else {
+    await handleMyIp();
+  }
 });
 
-function addToHistory(geoIP: GeoIP) {
-  const newEntry: LookupHistory = {
-    id: crypto.randomUUID(),
-    ip: geoIP.ip,
-    organization: geoIP.organization,
-    location:
-      geoIP.city && geoIP.country
-        ? `${geoIP.city}, ${geoIP.country}`
-        : geoIP.country || "Unknown",
-    timestamp: new Date(),
-  };
-  history.value.unshift(newEntry);
-  if (history.value.length > 10) {
-    history.value.pop();
+watch(ipInput, (newVal) => {
+  if (newVal) {
+    router.replace({ query: { ip: newVal } });
+  } else {
+    router.replace({ query: {} });
   }
-}
+});
 
 async function handleLookup() {
   if (!ipInput.value.trim()) return;
+
+  if (!userStore.isAuthenticated) {
+    router.push({ path: "/login", query: { redirect: route.fullPath } });
+    return;
+  }
 
   isLoading.value = true;
   error.value = "";
@@ -179,7 +200,12 @@ async function handleLookup() {
   try {
     const data = await lookupIp(ipInput.value);
     result.value = data;
-    addToHistory(data);
+    router.replace({ query: { ip: ipInput.value } });
+
+    const location = data.city && data.country
+      ? `${data.city}, ${data.country}`
+      : data.country || "Unknown";
+    historyStore.addEntry(data.ip, data.organization || "", location);
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Failed to lookup IP";
   } finally {
@@ -195,7 +221,6 @@ async function handleMyIp() {
   try {
     const data = await getMyIp();
     result.value = data;
-    addToHistory(data);
     ipInput.value = data.ip;
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Failed to get my IP";
