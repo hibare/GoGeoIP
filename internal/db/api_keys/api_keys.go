@@ -163,6 +163,7 @@ func ListAPIKeys(ctx context.Context, tx *gorm.DB, params url.Values) ([]APIKey,
 
 	err = tx.WithContext(ctx).
 		Scopes(qb.Scope(opts)).
+		Order("created_at DESC").
 		Find(&apiKeys).Error
 
 	return apiKeys, err

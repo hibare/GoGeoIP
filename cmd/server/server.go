@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ggicci/httpin"
+	httpin_integration "github.com/ggicci/httpin/integration"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v3"
@@ -130,7 +131,6 @@ func (s *Server) Init() error {
 				r.With(httpin.NewInput(handlers.APIKeyIDInput{})).Post("/{id}/revoke", apiKeyHandler.RevokeAPIKey)
 				r.With(httpin.NewInput(handlers.APIKeyIDInput{})).Delete("/{id}", apiKeyHandler.DeleteAPIKey)
 			})
-
 		})
 	})
 
@@ -278,4 +278,8 @@ var ServeCmd = &cobra.Command{
 		// Start serving
 		return server.serve()
 	},
+}
+
+func init() {
+	httpin_integration.UseGochiURLParam("path", chi.URLParam)
 }

@@ -60,7 +60,7 @@ type ServerConfig struct {
 	RequestTimeout time.Duration `mapstructure:"request_timeout"`
 	CertFile       string        `mapstructure:"cert_file"`
 	KeyFile        string        `mapstructure:"key_file"`
-	APIKeys        []string      `mapstructure:"api_keys"`
+	APIKeys        []string      `mapstructure:"api_keys"` //nolint:gosec // list of valid API keys for authentication
 }
 
 // GetAddr returns the API server's listen address in "host:port" format.

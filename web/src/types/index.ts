@@ -20,5 +20,6 @@ export interface LookupHistory {
   ip: string
   organization: string
   location: string
+  countryCode?: string
   timestamp: Date
 }

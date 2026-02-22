@@ -1,0 +1,5 @@
+.volumes
+.git
+node_modules
+dist
+*.md

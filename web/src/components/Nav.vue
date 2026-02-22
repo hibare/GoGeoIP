@@ -54,6 +54,13 @@
               >
                 Profile
               </RouterLink>
+              <RouterLink
+                to="/api-keys"
+                class="block px-4 py-2 text-sm hover:bg-accent"
+                @click="showDropdown = false"
+              >
+                API Keys
+              </RouterLink>
               <button
                 class="w-full text-left px-4 py-2 text-sm hover:bg-accent"
                 @click="handleLogout"

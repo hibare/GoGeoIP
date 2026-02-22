@@ -33,12 +33,15 @@
 import { computed, h } from "vue";
 import { useRouter } from "vue-router";
 import { useTimeAgo } from "@vueuse/core";
-import { ClockIcon, Trash2Icon } from "lucide-vue-next";
+import { ClockIcon, Trash2Icon, SearchIcon } from "lucide-vue-next";
 import { createColumnHelper } from "@tanstack/vue-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import DataTable from "@/components/DataTable.vue";
 import { useHistoryStore, type LookupHistory } from "@/store/history";
+import { formatDateTime } from "@/lib/utils";
+import { getCountryFlag } from "@/lib/flags";
 
 const router = useRouter();
 const historyStore = useHistoryStore();
@@ -58,18 +61,29 @@ const columns = computed(() => [
   }),
   columnHelper.accessor("location", {
     header: "Location",
-    cell: ({ row }) => row.original.location || "-",
+    cell: ({ row }) => {
+      const location = row.original.location || "-";
+      const flag = getCountryFlag(row.original.countryCode || "");
+      return h("span", { class: "flex items-center gap-2" }, [
+        flag ? h("span", {}, flag) : null,
+        location
+      ]);
+    },
   }),
   columnHelper.accessor("first_lookup", {
     header: "First Lookup",
     cell: ({ row }) => {
       const timestamp = row.original.first_lookup;
       const timeAgo = useTimeAgo(timestamp);
-      return h(
-        Badge,
-        { variant: "secondary", class: "flex items-center gap-1" },
-        () => [h(ClockIcon, { class: "w-3 h-3" }), timeAgo.value],
-      );
+      return h(Tooltip, {}, () => [
+        h(TooltipTrigger, { asChild: true }, () =>
+          h(Badge, { variant: "secondary", class: "flex items-center gap-1 cursor-default" }, () => [
+            h(ClockIcon, { class: "w-3 h-3" }),
+            timeAgo.value
+          ])
+        ),
+        h(TooltipContent, {}, () => formatDateTime(timestamp))
+      ]);
     },
   }),
   columnHelper.accessor("timestamp", {
@@ -77,11 +91,15 @@ const columns = computed(() => [
     cell: ({ row }) => {
       const timestamp = row.original.timestamp;
       const timeAgo = useTimeAgo(timestamp);
-      return h(
-        Badge,
-        { variant: "outline", class: "flex items-center gap-1" },
-        () => [h(ClockIcon, { class: "w-3 h-3" }), timeAgo.value],
-      );
+      return h(Tooltip, {}, () => [
+        h(TooltipTrigger, { asChild: true }, () =>
+          h(Badge, { variant: "outline", class: "flex items-center gap-1 cursor-default" }, () => [
+            h(ClockIcon, { class: "w-3 h-3" }),
+            timeAgo.value
+          ])
+        ),
+        h(TooltipContent, {}, () => formatDateTime(timestamp))
+      ]);
     },
   }),
   columnHelper.accessor("times_looked", {
@@ -99,19 +117,31 @@ const columns = computed(() => [
     id: "actions",
     header: "",
     cell: ({ row }) => {
-      return h(
-        Button,
-        {
-          variant: "ghost",
-          size: "sm",
-          class: "h-8 w-8 p-0",
-          onClick: (e: Event) => {
-            e.stopPropagation();
-            historyStore.removeEntry(row.original.id);
+      return h("div", { class: "flex gap-1" }, [
+        h(
+          Button,
+          {
+            variant: "ghost",
+            size: "sm",
+            class: "h-8 w-8 p-0",
+            onClick: () => lookupAgain(row.original.ip),
           },
-        },
-        () => h(Trash2Icon, { class: "w-4 h-4" }),
-      );
+          () => h(SearchIcon, { class: "w-4 h-4" })
+        ),
+        h(
+          Button,
+          {
+            variant: "ghost",
+            size: "sm",
+            class: "h-8 w-8 p-0",
+            onClick: (e: Event) => {
+              e.stopPropagation();
+              historyStore.removeEntry(row.original.id);
+            },
+          },
+          () => h(Trash2Icon, { class: "w-4 h-4" }),
+        ),
+      ]);
     },
   }),
 ]);

@@ -6,6 +6,7 @@ export interface LookupHistory {
   ip: string
   organization: string
   location: string
+  countryCode?: string
   timestamp: number
   first_lookup: number
   times_looked: number
@@ -36,7 +37,7 @@ export const useHistoryStore = defineStore("history", () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history.value))
   }
 
-  function addEntry(ip: string, organization: string, location: string) {
+  function addEntry(ip: string, organization: string, location: string, countryCode?: string) {
     const existingIndex = history.value.findIndex((h) => h.ip === ip)
 
     if (existingIndex !== -1) {
@@ -44,6 +45,7 @@ export const useHistoryStore = defineStore("history", () => {
       existing.timestamp = Date.now()
       existing.organization = organization
       existing.location = location
+      existing.countryCode = countryCode
       existing.times_looked += 1
       history.value = [...history.value]
     } else {
@@ -53,6 +55,7 @@ export const useHistoryStore = defineStore("history", () => {
         ip,
         organization,
         location,
+        countryCode,
         timestamp: now,
         first_lookup: now,
         times_looked: 1,

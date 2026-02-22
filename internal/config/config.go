@@ -133,7 +133,7 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	v.AutomaticEnv()
 
 	// Environment variable bindings.
-	envBindings := map[string]string{
+	envBindings := map[string]string{ //nolint:gosec // mapping config keys to env vars, not actual secrets
 		"core.environment":             "CORE_ENVIRONMENT",
 		"core.secret_key":              "CORE_SECRET_KEY",
 		"core.data_dir":                "CORE_DATA_DIR",

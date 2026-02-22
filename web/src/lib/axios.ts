@@ -72,6 +72,20 @@ axios.interceptors.response.use(
           toast.warning("Not Found");
           break;
 
+        case 422:
+          let validationError = "Validation Error";
+          if (error.response?.data) {
+            if (typeof error.response.data === "string") {
+              validationError = error.response.data;
+            } else if (error.response.data?.message) {
+              validationError = error.response.data.message;
+            } else if (error.response.data?.error) {
+              validationError = error.response.data.error;
+            }
+          }
+          toast.error(validationError);
+          break;
+
         case 500:
           toast.error("Server Error");
           break;

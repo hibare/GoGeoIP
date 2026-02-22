@@ -53,9 +53,12 @@
           </CardTitle>
         </CardHeader>
         <CardContent class="space-y-2">
-          <div class="flex justify-between">
+          <div class="flex justify-between items-center">
             <span class="text-muted-foreground">Country</span>
-            <span class="font-medium">{{ result.country || "N/A" }}</span>
+            <span class="font-medium flex items-center gap-2">
+              <span v-if="getCountryFlag(result.iso_country_code)">{{ getCountryFlag(result.iso_country_code) }}</span>
+              {{ result.country || "N/A" }}
+            </span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">City</span>
@@ -156,6 +159,7 @@ import { useUserStore } from "@/store/auth";
 import { useHistoryStore } from "@/store/history";
 import type { GeoIP } from "@/types";
 import { getMyIp, lookupIp } from "@/apis/ip";
+import { getCountryFlag } from "@/lib/flags";
 
 const router = useRouter();
 const route = useRoute();
@@ -205,7 +209,7 @@ async function handleLookup() {
     const location = data.city && data.country
       ? `${data.city}, ${data.country}`
       : data.country || "Unknown";
-    historyStore.addEntry(data.ip, data.organization || "", location);
+    historyStore.addEntry(data.ip, data.organization || "", location, data.iso_country_code);
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Failed to lookup IP";
   } finally {

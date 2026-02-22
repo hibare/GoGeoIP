@@ -65,7 +65,7 @@ const (
 type DBConfig struct {
 	DBType          DBType        `mapstructure:"type"`
 	Username        string        `mapstructure:"username"`
-	Password        string        `mapstructure:"password"`
+	Password        string        `mapstructure:"password"` //nolint:gosec // required for database connection
 	Host            string        `mapstructure:"host"`
 	Port            int           `mapstructure:"port"`
 	Name            string        `mapstructure:"name"`
