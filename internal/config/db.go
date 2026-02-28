@@ -69,6 +69,7 @@ type DBConfig struct {
 	Host            string        `mapstructure:"host"`
 	Port            int           `mapstructure:"port"`
 	Name            string        `mapstructure:"name"`
+	SSLMode         string        `mapstructure:"ssl_mode"`
 	MaxIdleConn     int           `mapstructure:"max_idle_conn"`
 	MaxOpenConn     int           `mapstructure:"max_open_conn"`
 	ConnMaxLifetime time.Duration `mapstructure:"conn_max_lifetime"`
@@ -101,11 +102,16 @@ func (d *DBConfig) Validate() error {
 
 // GetDSN constructs the Data Source Name based on DB type.
 func (d *DBConfig) GetDSN() (string, error) {
+	sslmode := d.SSLMode
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+
 	switch d.DBType {
 	case DBTypePostgres:
 		return fmt.Sprintf(
-			"postgres://%s:%s@%s/%s?sslmode=disable",
-			d.Username, d.Password, net.JoinHostPort(d.Host, strconv.Itoa(d.Port)), d.Name,
+			"postgres://%s:%s@%s/%s?sslmode=%s",
+			d.Username, d.Password, net.JoinHostPort(d.Host, strconv.Itoa(d.Port)), d.Name, sslmode,
 		), nil
 	default:
 		return "", ErrUnsupportedDB

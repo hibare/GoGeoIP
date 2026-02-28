@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
 	appErrors "github.com/hibare/Waypoint/cmd/server/errors"
 	"github.com/hibare/Waypoint/cmd/server/middlewares"
 	"github.com/hibare/Waypoint/cmd/server/utils"
@@ -40,7 +41,7 @@ func NewAPIKeyHandler(db *gorm.DB) *APIKeyHandler {
 func (h *APIKeyHandler) ListAPIKeys(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middlewares.GetAuthUserID(r)
 	if !ok {
-		http.Error(w, appErrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, appErrors.ErrUnauthorized)
 		return
 	}
 
@@ -50,7 +51,7 @@ func (h *APIKeyHandler) ListAPIKeys(w http.ResponseWriter, r *http.Request) {
 	keys, err := apikeys.ListAPIKeys(r.Context(), h.db, params)
 	if err != nil {
 		slog.ErrorContext(r.Context(), "failed to list API keys", "error", err)
-		http.Error(w, appErrors.ErrSomethingWentWrong.Error(), http.StatusInternalServerError)
+		commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, appErrors.ErrSomethingWentWrong)
 		return
 	}
 
@@ -61,13 +62,13 @@ func (h *APIKeyHandler) ListAPIKeys(w http.ResponseWriter, r *http.Request) {
 func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middlewares.GetAuthUserID(r)
 	if !ok {
-		http.Error(w, appErrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, appErrors.ErrUnauthorized)
 		return
 	}
 
 	payload, ok := utils.InputFromContext[APIKeyCreateInput](r)
 	if !ok {
-		http.Error(w, appErrors.ErrReadingPayload.Error(), http.StatusBadRequest)
+		commonHttp.WriteErrorResponse(w, http.StatusBadRequest, appErrors.ErrReadingPayload)
 		return
 	}
 
@@ -79,19 +80,18 @@ func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := apiKey.Validate(); err != nil {
-		slog.ErrorContext(r.Context(), "invalid job payload", "error", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		commonHttp.WriteErrorResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	_, rawKey, err := apikeys.CreateAPIKey(r.Context(), h.db, apiKey)
 	if err != nil {
 		if errors.Is(err, apikeys.ErrDuplicateAPIKeyName) {
-			http.Error(w, "API key name already exists", http.StatusConflict)
+			commonHttp.WriteErrorResponse(w, http.StatusConflict, err)
 			return
 		}
 		slog.ErrorContext(r.Context(), "failed to create API key", "error", err)
-		http.Error(w, appErrors.ErrSomethingWentWrong.Error(), http.StatusInternalServerError)
+		commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, appErrors.ErrSomethingWentWrong)
 		return
 	}
 
@@ -102,24 +102,24 @@ func (h *APIKeyHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 func (h *APIKeyHandler) RevokeAPIKey(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middlewares.GetAuthUserID(r)
 	if !ok {
-		http.Error(w, appErrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, appErrors.ErrUnauthorized)
 		return
 	}
 
 	payload, ok := utils.InputFromContext[APIKeyIDInput](r)
 	if !ok {
-		http.Error(w, appErrors.ErrReadingPayload.Error(), http.StatusBadRequest)
+		commonHttp.WriteErrorResponse(w, http.StatusBadRequest, appErrors.ErrReadingPayload)
 		return
 	}
 
 	err := apikeys.RevokeAPIKey(r.Context(), h.db, payload.ID, *userID)
 	if err != nil {
 		if errors.Is(err, apikeys.ErrAPIKeyNotFound) {
-			http.Error(w, "API key not found", http.StatusNotFound)
+			commonHttp.WriteErrorResponse(w, http.StatusNotFound, err)
 			return
 		}
 		slog.ErrorContext(r.Context(), "failed to revoke API key", "error", err)
-		http.Error(w, appErrors.ErrSomethingWentWrong.Error(), http.StatusInternalServerError)
+		commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, appErrors.ErrSomethingWentWrong)
 		return
 	}
 
@@ -130,24 +130,24 @@ func (h *APIKeyHandler) RevokeAPIKey(w http.ResponseWriter, r *http.Request) {
 func (h *APIKeyHandler) DeleteAPIKey(w http.ResponseWriter, r *http.Request) {
 	userID, ok := middlewares.GetAuthUserID(r)
 	if !ok {
-		http.Error(w, appErrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, appErrors.ErrUnauthorized)
 		return
 	}
 
 	payload, ok := utils.InputFromContext[APIKeyIDInput](r)
 	if !ok {
-		http.Error(w, appErrors.ErrReadingPayload.Error(), http.StatusBadRequest)
+		commonHttp.WriteErrorResponse(w, http.StatusBadRequest, appErrors.ErrReadingPayload)
 		return
 	}
 
 	err := apikeys.DeleteAPIKey(r.Context(), h.db, payload.ID, *userID)
 	if err != nil {
 		if errors.Is(err, apikeys.ErrAPIKeyNotFound) {
-			http.Error(w, "API key not found", http.StatusNotFound)
+			commonHttp.WriteErrorResponse(w, http.StatusNotFound, err)
 			return
 		}
 		slog.ErrorContext(r.Context(), "failed to delete API key", "error", err)
-		http.Error(w, appErrors.ErrSomethingWentWrong.Error(), http.StatusInternalServerError)
+		commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, appErrors.ErrSomethingWentWrong)
 		return
 	}
 

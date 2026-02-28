@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
 	"github.com/hibare/Waypoint/cmd/server/errors"
 	"github.com/hibare/Waypoint/cmd/server/utils"
 	"github.com/hibare/Waypoint/internal/auth"
@@ -56,7 +57,7 @@ func UnifiedAuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
 			}
 
 			// Not authenticated
-			http.Error(w, errors.ErrAuthenticationRequired.Error(), http.StatusUnauthorized)
+			commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, errors.ErrAuthenticationRequired)
 			return
 
 		authenticated:

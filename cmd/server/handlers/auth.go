@@ -11,6 +11,7 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/go-chi/render"
+	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
 	apperrors "github.com/hibare/Waypoint/cmd/server/errors"
 	"github.com/hibare/Waypoint/cmd/server/middlewares"
 	"github.com/hibare/Waypoint/cmd/server/utils"
@@ -345,16 +346,16 @@ func (a *Auth) Logout(w http.ResponseWriter, r *http.Request) {
 func (a *Auth) Me(w http.ResponseWriter, r *http.Request) {
 	claims, ok := middlewares.GetAuthUser(r)
 	if !ok {
-		http.Error(w, apperrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, apperrors.ErrUnauthorized)
 		return
 	}
 	user, err := users.GetUserByID(r.Context(), a.db, claims.UserID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			http.Error(w, apperrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+			commonHttp.WriteErrorResponse(w, http.StatusUnauthorized, apperrors.ErrUnauthorized)
 			return
 		}
-		http.Error(w, apperrors.ErrSomethingWentWrong.Error(), http.StatusInternalServerError)
+		commonHttp.WriteErrorResponse(w, http.StatusInternalServerError, apperrors.ErrSomethingWentWrong)
 		return
 	}
 
