@@ -14,7 +14,7 @@ import (
 
 const (
 	// JWT cookie name.
-	JWTCookieName = "x-axon-auth"
+	JWTCookieName = "x-waypoint-auth"
 )
 
 var (

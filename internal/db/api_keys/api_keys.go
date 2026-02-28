@@ -251,3 +251,22 @@ func MarkExpiredAPIKeys(ctx context.Context, db *gorm.DB) error {
 
 	return result.Error
 }
+
+// GetAPIKeyByHash retrieves an active API key by its hash.
+func GetAPIKeyByHash(ctx context.Context, db *gorm.DB, keyHash string) (*APIKey, error) {
+	var apiKey APIKey
+	now := time.Now().UTC()
+
+	err := db.WithContext(ctx).
+		Where("key_hash = ? AND state = ? AND (expires_at IS NULL OR expires_at > ?)", keyHash, StatusActive, now).
+		First(&apiKey).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrAPIKeyNotFound
+		}
+		return nil, err
+	}
+
+	return &apiKey, nil
+}

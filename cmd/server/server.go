@@ -116,7 +116,8 @@ func (s *Server) Init() error {
 
 		// Protected routes.
 		r.Group(func(r chi.Router) {
-			r.Use(middlewares.CookieAuthMiddleware)
+			// Unified auth: supports both API key and cookie authentication
+			r.Use(middlewares.UnifiedAuthMiddleware(s.db))
 			r.Get("/ip/{ip}", geoIPHandler.GetGeoIP)
 			r.Get("/auth/me", authHandler.Me)
 
