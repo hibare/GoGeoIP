@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/constants"
 )
 
 var (

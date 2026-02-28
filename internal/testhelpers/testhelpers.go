@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/constants"
 )
 
 const (

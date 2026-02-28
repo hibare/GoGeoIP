@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/hibare/GoGeoIP/cmd/server/errors"
-	"github.com/hibare/GoGeoIP/cmd/server/utils"
-	"github.com/hibare/GoGeoIP/internal/auth"
+	"github.com/hibare/Waypoint/cmd/server/errors"
+	"github.com/hibare/Waypoint/cmd/server/utils"
+	"github.com/hibare/Waypoint/internal/auth"
 )
 
 // UserContextKey is the key for user information in request context.

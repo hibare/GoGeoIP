@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/hibare/GoGeoIP/internal/auth"
+	"github.com/hibare/Waypoint/internal/auth"
 )
 
 const (

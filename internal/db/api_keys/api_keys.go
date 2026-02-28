@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/constants"
-	"github.com/hibare/GoGeoIP/internal/db"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/constants"
+	"github.com/hibare/Waypoint/internal/db"
 	"gorm.io/gorm"
 )
 

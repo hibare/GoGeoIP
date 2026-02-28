@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/hibare/Waypoint/internal/config"
 )
 
 var (

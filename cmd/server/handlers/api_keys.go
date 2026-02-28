@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/go-chi/render"
-	appErrors "github.com/hibare/GoGeoIP/cmd/server/errors"
-	"github.com/hibare/GoGeoIP/cmd/server/middlewares"
-	"github.com/hibare/GoGeoIP/cmd/server/utils"
-	apikeys "github.com/hibare/GoGeoIP/internal/db/api_keys"
+	appErrors "github.com/hibare/Waypoint/cmd/server/errors"
+	"github.com/hibare/Waypoint/cmd/server/middlewares"
+	"github.com/hibare/Waypoint/cmd/server/utils"
+	apikeys "github.com/hibare/Waypoint/internal/db/api_keys"
 	"gorm.io/gorm"
 )
 

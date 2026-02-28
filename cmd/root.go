@@ -3,12 +3,12 @@ package cmd
 import (
 	"os"
 
-	"github.com/hibare/GoGeoIP/cmd/db"
-	"github.com/hibare/GoGeoIP/cmd/lookup"
-	"github.com/hibare/GoGeoIP/cmd/maxmind"
-	"github.com/hibare/GoGeoIP/cmd/server"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/cmd/db"
+	"github.com/hibare/Waypoint/cmd/lookup"
+	"github.com/hibare/Waypoint/cmd/maxmind"
+	"github.com/hibare/Waypoint/cmd/server"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/spf13/cobra"
 )
 
@@ -17,9 +17,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "go_geo_ip",
-	Short:   "API to fetch Geo information for an IP",
-	Long:    "",
+	Use:     "waypoint",
+	Short:   "IP Geolocation Service",
+	Long:    "Waypoint is an IP geolocation service that provides geographic information for any IP address using MaxMind GeoIP databases.",
 	Version: constants.Version,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		_, err := config.Load(cmd.Context(), ConfigPath)

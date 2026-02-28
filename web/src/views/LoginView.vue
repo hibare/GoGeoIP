@@ -3,7 +3,7 @@
     <Card class="w-full max-w-md">
       <CardHeader class="space-y-1 text-center">
         <div class="flex justify-center mb-4">
-          <img src="/logo.png" alt="GoGeoIP" class="h-20 w-auto" />
+          <img src="/logo.png" alt="Waypoint" class="h-20 w-auto" />
         </div>
         <CardDescription>
           Sign in to access your IP lookup history and settings

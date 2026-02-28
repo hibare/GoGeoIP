@@ -1,7 +1,7 @@
 package constants
 
 const (
-	ProgramIdentifier = "gogeoip"
+	ProgramIdentifier = "waypoint"
 	AssetDir          = "./data"
 	UIAddress         = "https://localhost:5173" // This is the UI dev server address. Used to redirect users to the UI after OIDC login.
 )

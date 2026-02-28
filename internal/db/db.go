@@ -5,7 +5,7 @@ import (
 	"embed"
 
 	commonDB "github.com/hibare/GoCommon/v2/pkg/db"
-	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/hibare/Waypoint/internal/config"
 )
 
 //go:embed migrations/table/*.sql

@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	commonErrors "github.com/hibare/GoCommon/v2/pkg/errors"
 	commonHttp "github.com/hibare/GoCommon/v2/pkg/http"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/maxmind"
 )
 
 // GeoIP handles GeoIP-related requests.

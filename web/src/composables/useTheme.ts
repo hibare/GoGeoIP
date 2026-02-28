@@ -6,7 +6,7 @@ const theme = ref<Theme>('light')
 
 export function useTheme() {
   function init() {
-    const saved = localStorage.getItem('gogeoip_theme') as Theme | null
+    const saved = localStorage.getItem('waypoint_theme') as Theme | null
     if (saved) {
       theme.value = saved
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -26,13 +26,13 @@ export function useTheme() {
 
   function toggle() {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
-    localStorage.setItem('gogeoip_theme', theme.value)
+    localStorage.setItem('waypoint_theme', theme.value)
     applyTheme()
   }
 
   function set(t: Theme) {
     theme.value = t
-    localStorage.setItem('gogeoip_theme', t)
+    localStorage.setItem('waypoint_theme', t)
     applyTheme()
   }
 

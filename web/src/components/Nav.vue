@@ -2,8 +2,8 @@
   <header class="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50 shrink-0">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
       <RouterLink to="/" class="flex items-center gap-2">
-        <img src="/logo.png" alt="GoGeoIP" class="h-8 w-auto" />
-        <span class="text-xl font-semibold tracking-tight">GoGeoIP</span>
+        <img src="/logo.png" alt="Waypoint" class="h-8 w-auto" />
+        <span class="text-xl font-semibold tracking-tight">Waypoint</span>
       </RouterLink>
       <div class="flex items-center gap-4">
         <nav class="hidden md:flex items-center gap-1">

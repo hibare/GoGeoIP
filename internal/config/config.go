@@ -124,11 +124,11 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	} else {
 		v.AddConfigPath(".")
 		v.AddConfigPath("./config")
-		v.AddConfigPath("/etc/gogeoip/")
+		v.AddConfigPath("/etc/waypoint/")
 	}
 
 	// Environment variable binding.
-	v.SetEnvPrefix("GOGEOIP")
+	v.SetEnvPrefix("WAYPOINT")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	v.AutomaticEnv()
 

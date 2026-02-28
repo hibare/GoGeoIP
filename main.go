@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hibare/GoGeoIP/cmd"
-	"github.com/hibare/GoGeoIP/cmd/common"
+	"github.com/hibare/Waypoint/cmd"
+	"github.com/hibare/Waypoint/cmd/common"
 )
 
 func main() {

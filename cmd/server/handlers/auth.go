@@ -11,12 +11,12 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/go-chi/render"
-	apperrors "github.com/hibare/GoGeoIP/cmd/server/errors"
-	"github.com/hibare/GoGeoIP/cmd/server/middlewares"
-	"github.com/hibare/GoGeoIP/cmd/server/utils"
-	"github.com/hibare/GoGeoIP/internal/auth"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/db/users"
+	apperrors "github.com/hibare/Waypoint/cmd/server/errors"
+	"github.com/hibare/Waypoint/cmd/server/middlewares"
+	"github.com/hibare/Waypoint/cmd/server/utils"
+	"github.com/hibare/Waypoint/internal/auth"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/db/users"
 	"golang.org/x/oauth2"
 	"gorm.io/gorm"
 )

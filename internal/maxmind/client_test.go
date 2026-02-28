@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/maxmind"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

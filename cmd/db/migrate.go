@@ -3,15 +3,15 @@ package db
 import (
 	"log/slog"
 
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/db"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/db"
 	"github.com/spf13/cobra"
 )
 
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
-	Short: "Migrate DB",
-	Long:  `Execute database migrations to apply schema changes, create new tables, or modify existing structures in the Axon database.`,
+	Short: "Run database migrations",
+	Long:  "Execute database migrations to apply schema changes, create new tables, or modify existing structures in the Waypoint database.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 		dbInstance, err := db.New(ctx, config.Current)

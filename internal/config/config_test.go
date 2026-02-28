@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

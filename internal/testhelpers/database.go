@@ -8,7 +8,7 @@ import (
 	"time"
 
 	commonDB "github.com/hibare/GoCommon/v2/pkg/db"
-	"github.com/hibare/GoGeoIP/internal/db"
+	"github.com/hibare/Waypoint/internal/db"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"

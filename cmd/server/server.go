@@ -18,12 +18,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v3"
-	"github.com/hibare/GoGeoIP/cmd/server/handlers"
-	"github.com/hibare/GoGeoIP/cmd/server/middlewares"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/constants"
-	"github.com/hibare/GoGeoIP/internal/db"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
+	"github.com/hibare/Waypoint/cmd/server/handlers"
+	"github.com/hibare/Waypoint/cmd/server/middlewares"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/constants"
+	"github.com/hibare/Waypoint/internal/db"
+	"github.com/hibare/Waypoint/internal/maxmind"
 	"github.com/spf13/cobra"
 	"gorm.io/gorm"
 )
@@ -236,10 +236,10 @@ func (s *Server) serve() error {
 
 // ServeCmd represents the server command.
 var ServeCmd = &cobra.Command{
-	Use:     "server",
-	Short:   "Start API Server",
-	Long:    "",
-	Aliases: []string{"serve", "run"},
+	Use:     "serve",
+	Short:   "Start the API server",
+	Long:    "Start the Waypoint API server. The server provides IP geolocation endpoints and optionally serves the web UI.",
+	Aliases: []string{"server", "run"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 

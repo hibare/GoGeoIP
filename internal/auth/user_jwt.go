@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/constants"
-	"github.com/hibare/GoGeoIP/internal/db/users"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/constants"
+	"github.com/hibare/Waypoint/internal/db/users"
 )
 
 const (

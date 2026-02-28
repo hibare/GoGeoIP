@@ -12,7 +12,7 @@ export interface LookupHistory {
   times_looked: number
 }
 
-const STORAGE_KEY = "gogeoip_lookup_history"
+const STORAGE_KEY = "waypoint_lookup_history"
 const MAX_ENTRIES = 100
 
 export const useHistoryStore = defineStore("history", () => {

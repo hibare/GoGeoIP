@@ -3,7 +3,7 @@ package common
 import (
 	"fmt"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/constants"
 )
 
 func Banner() {

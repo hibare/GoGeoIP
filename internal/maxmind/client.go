@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/hibare/Waypoint/internal/config"
 	"github.com/oschwald/geoip2-golang"
 )
 

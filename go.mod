@@ -1,4 +1,4 @@
-module github.com/hibare/GoGeoIP
+module github.com/hibare/Waypoint
 
 go 1.26.0
 

@@ -1,8 +1,8 @@
 services:
   api:
-    image: hibare/go-geo-ip
-    container_name: go-geo-ip
-    hostname: go-geo-ip
+    image: hibare/waypoint
+    container_name: waypoint
+    hostname: waypoint
     env_file:
       - .env
     ports:
