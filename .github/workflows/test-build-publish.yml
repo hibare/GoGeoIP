@@ -96,7 +96,7 @@ jobs:
         with:
           image_names: ${{ steps.set-metadata.outputs.docker_image_names }}
           tags: ${{ steps.set-metadata.outputs.docker_tags }}
-          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push_dockerhub: ${{ github.event_name != 'pull_request' }}
           push_ghcr: ${{ github.event_name != 'pull_request' }}
           build_args: VERSION=${{ steps.set-metadata.outputs.version }} GOLANG_VERSION=${{ steps.set-metadata.outputs.golang_version }}
