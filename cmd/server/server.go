@@ -111,7 +111,6 @@ func (s *Server) Init() error {
 				r.With(httpin.NewInput(handlers.LoginInput{})).Get("/login", authHandler.Login)
 				r.With(httpin.NewInput(handlers.CallbackInput{})).Get("/callback", authHandler.Callback)
 				r.Post("/logout", authHandler.Logout)
-				r.Get("/me", authHandler.Me)
 			})
 		})
 

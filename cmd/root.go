@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log/slog"
 	"os"
 
 	"github.com/hibare/GoGeoIP/cmd/db"
@@ -22,6 +21,10 @@ var rootCmd = &cobra.Command{
 	Short:   "API to fetch Geo information for an IP",
 	Long:    "",
 	Version: constants.Version,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		_, err := config.Load(cmd.Context(), ConfigPath)
+		return err
+	},
 }
 
 func Execute() {
@@ -40,11 +43,4 @@ func init() {
 	rootCmd.AddCommand(maxmind.MaxmindCmd)
 	rootCmd.AddCommand(lookup.LookupCmd)
 	rootCmd.AddCommand(server.ServeCmd)
-
-	// Load config with context
-	ctx := rootCmd.Context()
-	if _, err := config.Load(ctx, ConfigPath); err != nil {
-		slog.Error("Failed to load config", "error", err)
-		os.Exit(1)
-	}
 }

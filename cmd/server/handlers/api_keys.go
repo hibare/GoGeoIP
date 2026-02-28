@@ -108,7 +108,7 @@ func (h *APIKeyHandler) RevokeAPIKey(w http.ResponseWriter, r *http.Request) {
 
 	payload, ok := utils.InputFromContext[APIKeyIDInput](r)
 	if !ok {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		http.Error(w, appErrors.ErrReadingPayload.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (h *APIKeyHandler) DeleteAPIKey(w http.ResponseWriter, r *http.Request) {
 
 	payload, ok := utils.InputFromContext[APIKeyIDInput](r)
 	if !ok {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+		http.Error(w, appErrors.ErrReadingPayload.Error(), http.StatusBadRequest)
 		return
 	}
 

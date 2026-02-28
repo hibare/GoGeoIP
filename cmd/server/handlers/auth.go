@@ -343,7 +343,11 @@ func (a *Auth) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Auth) Me(w http.ResponseWriter, r *http.Request) {
-	claims := r.Context().Value(middlewares.UserKey).(*auth.UserJWTClaims) //nolint:errcheck // authenticated by middleware
+	claims, ok := middlewares.GetAuthUser(r)
+	if !ok {
+		http.Error(w, apperrors.ErrUnauthorized.Error(), http.StatusUnauthorized)
+		return
+	}
 	user, err := users.GetUserByID(r.Context(), a.db, claims.UserID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
