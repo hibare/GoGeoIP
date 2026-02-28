@@ -42,3 +42,18 @@ repos:
         args: [--dialect, postgres, --exclude-rules, "RF06,RF04"]
       - id: sqlfluff-fix
         args: [--dialect, postgres, --exclude-rules, "RF06,RF04"]
+
+  - repo: local
+    hooks:
+      - id: eslint-web
+        name: ESLint Web
+        entry: bash -c 'cd web && pnpm exec eslint .'
+        language: system
+        pass_filenames: false
+
+      - id: build-web
+        name: Build Web
+        entry: bash -c 'cd web && pnpm run build'
+        language: system
+        pass_filenames: false
+        files: ^web/
