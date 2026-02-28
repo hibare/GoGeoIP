@@ -18,8 +18,8 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:     "waypoint",
-	Short:   "IP Geolocation Service",
-	Long:    "Waypoint is an IP geolocation service that provides geographic information for any IP address using MaxMind GeoIP databases.",
+	Short:   "IP Geo location Service",
+	Long:    "Waypoint is an IP geo location service that provides geographic information for any IP address using MaxMind GeoIP databases.",
 	Version: constants.Version,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		_, err := config.Load(cmd.Context(), ConfigPath)
