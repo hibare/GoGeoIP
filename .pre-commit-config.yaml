@@ -8,7 +8,7 @@ repos:
       - id: check-json
       - id: check-toml
       - id: check-yaml
-        exclude: ^charts/.*templates/
+        exclude: ^charts/.*templates/|pnpm-lock.yaml
       - id: end-of-file-fixer
         exclude: ^web/src/auto-imports\.d\.ts$
       - id: mixed-line-ending
