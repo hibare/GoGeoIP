@@ -14,23 +14,18 @@ const formattedBuildTimestamp = computed(() => {
 
 <template>
   <TooltipProvider>
-    <div
-      class="min-h-screen bg-background text-foreground transition-colors flex flex-col"
-    >
+    <div class="min-h-screen bg-background text-foreground transition-colors flex flex-col grid-bg">
       <Nav />
       <main class="container mx-auto py-8 px-4 flex-1">
         <RouterView />
       </main>
-      <footer class="border-t py-6 shrink-0">
-        <div
-          class="container mx-auto px-4 text-center text-xs text-muted-foreground"
-        >
+      <footer class="border-t py-4 shrink-0 border-neon-cyan/20" style="box-shadow: 0 -1px 12px oklch(0.82 0.18 195 / 10%);">
+        <div class="container mx-auto px-4 text-center text-xs font-mono">
           <div class="space-y-1">
-            <div>
-              {{ VERSION }} | {{ formattedBuildTimestamp }} |
-              {{ COMMIT_HASH.slice(0, 7) }}
+            <div class="neon-text opacity-50">
+              {{ VERSION }} | {{ formattedBuildTimestamp }} | {{ COMMIT_HASH.slice(0, 7) }}
             </div>
-            <div>Waypoint &copy; {{ new Date().getFullYear() }}</div>
+            <div class="text-muted-foreground tracking-widest uppercase text-[10px]">Waypoint &copy; {{ new Date().getFullYear() }}</div>
           </div>
         </div>
       </footer>

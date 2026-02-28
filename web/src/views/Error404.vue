@@ -1,25 +1,18 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-background">
     <div class="text-center space-y-6 max-w-md mx-auto px-4">
-      <!-- 404 Icon -->
-      <div class="flex justify-center text-9xl text-foreground">
-        <GhostIcon class="h-8 w-8" />
+      <div class="flex justify-center">
+        <GhostIcon class="h-16 w-16 neon-icon-cyan" />
       </div>
-      <!-- Error Message -->
-      <div class="">
-        <h1 class="text-2xl font-semibold text-foreground">Page Not Found</h1>
-        <p class="text-muted-foreground pt-4">
-          The page you're looking for doesn't exist or has been moved.
+      <p class="neon-error-code">404</p>
+      <div>
+        <h1 class="text-2xl neon-heading">Page Not Found</h1>
+        <p class="neon-subheading pt-4">
+          // the page you're looking for doesn't exist or has been moved
         </p>
       </div>
-
-      <!-- Actions -->
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <Button
-          @click="goBack"
-          variant="outline"
-          class="flex items-center gap-2"
-        >
+        <Button @click="goBack" variant="outline" class="flex items-center gap-2">
           <ArrowLeftIcon class="h-4 w-4" />
           Go Back
         </Button>
@@ -28,12 +21,8 @@
           Go to Home
         </Button>
       </div>
-
-      <!-- Additional Help -->
-      <div class="pt-4 border-t border-border">
-        <p class="text-sm text-muted-foreground">
-          If you believe this is an error, please contact support or admin.
-        </p>
+      <div class="pt-4 border-t border-border dark:border-neon-cyan/20">
+        <p class="neon-subheading">// if you believe this is an error, contact support or admin</p>
       </div>
     </div>
   </div>

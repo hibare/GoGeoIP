@@ -1,8 +1,10 @@
 <template>
   <div class="space-y-8">
     <div class="flex flex-col space-y-1">
-      <h1 class="text-3xl font-bold">Profile</h1>
-      <p class="text-muted-foreground">Manage your account settings</p>
+      <h1 class="text-3xl neon-heading">
+        <span class="dark:text-neon-pink/70">$</span> Profile
+      </h1>
+      <p class="neon-subheading">// manage your account settings</p>
     </div>
 
     <Card>
@@ -14,16 +16,12 @@
       </CardHeader>
       <CardContent class="space-y-6">
         <div class="flex items-center gap-6">
-          <div
-            class="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground text-3xl"
-          >
+          <div class="neon-avatar h-20 w-20 bg-primary text-primary-foreground text-3xl">
             {{ userStore.initials }}
           </div>
           <div class="space-y-1">
-            <p class="text-xl font-medium">{{ userStore.fullName }}</p>
-            <p class="text-sm text-muted-foreground">
-              {{ userStore.email }}
-            </p>
+            <p class="text-xl font-medium neon-data">{{ userStore.fullName }}</p>
+            <p class="neon-subheading">{{ userStore.email }}</p>
           </div>
         </div>
       </CardContent>
