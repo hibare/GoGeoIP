@@ -2,8 +2,10 @@
   <div class="space-y-8">
     <div class="flex items-center justify-between">
       <div class="flex flex-col space-y-1">
-        <h1 class="text-3xl font-bold">Recent Lookups</h1>
-        <p class="text-muted-foreground">Your recent IP lookups</p>
+        <h1 class="text-3xl neon-heading">
+          <span class="dark:text-neon-pink/70">$</span> Recent Lookups
+        </h1>
+        <p class="neon-subheading">// your recent IP lookups</p>
       </div>
       <Button
         v-if="history.length > 0"

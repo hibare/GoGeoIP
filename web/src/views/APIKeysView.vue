@@ -1,8 +1,10 @@
 <template>
   <div class="space-y-8">
     <div class="flex flex-col space-y-1">
-      <h1 class="text-3xl font-bold">API Keys</h1>
-      <p class="text-muted-foreground">Manage your API keys for programmatic access</p>
+      <h1 class="text-3xl neon-heading">
+        <span class="dark:text-neon-pink/70">$</span> API Keys
+      </h1>
+      <p class="neon-subheading">// manage your API keys for programmatic access</p>
     </div>
 
     <div class="flex justify-end">
@@ -125,9 +127,9 @@
           </DialogDescription>
         </DialogHeader>
         <div class="space-y-4">
-          <div class="p-3 border-2 border-dashed border-amber-500/50 rounded-md bg-amber-50/50">
+          <div class="neon-key-box">
             <div class="flex items-center gap-2">
-              <code class="flex-1 text-sm font-mono break-all text-amber-900">
+              <code class="neon-key-code flex-1">
                 {{ maskedKey }}
               </code>
               <Button variant="outline" size="sm" @click="copyKey">

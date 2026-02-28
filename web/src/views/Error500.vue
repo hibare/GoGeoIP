@@ -1,36 +1,24 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-background">
     <div class="text-center space-y-6 max-w-md mx-auto px-4">
-      <!-- 500 Icon -->
-      <div class="flex justify-center text-9xl text-foreground">
-        <ServerOff class="h-8 w-8" />
+      <div class="flex justify-center">
+        <ServerOff class="h-16 w-16 neon-icon-pink" />
       </div>
-
-      <!-- Error Message -->
-      <div class="">
-        <h1 class="text-2xl font-semibold text-foreground">Server Error</h1>
-        <div
-          class="mt-4 p-3 border-2 border-dashed border-destructive/50 rounded-md bg-destructive/5"
-        >
-          <p class="text-destructive text-sm font-medium">
-            {{ errorMessage }}
-          </p>
+      <p class="neon-error-code">500</p>
+      <div>
+        <h1 class="text-2xl neon-heading">Server Error</h1>
+        <div class="mt-4 p-3 border-2 border-dashed border-destructive/50 rounded-md bg-destructive/5 dark:border-neon-pink/40 dark:bg-neon-pink/5">
+          <p class="text-destructive text-sm font-medium font-mono dark:text-neon-pink">{{ errorMessage }}</p>
         </div>
       </div>
-
-      <!-- Actions -->
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
         <Button @click="goHome" class="flex items-center gap-2">
           <Home class="h-4 w-4" />
           Go to Home
         </Button>
       </div>
-
-      <!-- Additional Help -->
-      <div class="pt-4 border-t border-border">
-        <p class="text-sm text-muted-foreground">
-          If the problem persists, please contact support or admin.
-        </p>
+      <div class="pt-4 border-t border-border dark:border-neon-pink/20">
+        <p class="neon-subheading">// if the problem persists, contact support or admin</p>
       </div>
     </div>
   </div>

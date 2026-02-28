@@ -1,8 +1,10 @@
 <template>
   <div class="space-y-8">
     <div class="flex flex-col items-center justify-center space-y-4">
-      <h1 class="text-3xl font-bold">IP Geolocation Lookup</h1>
-      <p class="text-muted-foreground">Look up any IP address</p>
+      <h1 class="text-3xl neon-heading">
+        <span class="dark:text-neon-pink/70">$</span> IP Geolocation Lookup
+      </h1>
+      <p class="neon-subheading">// look up any IP address on the network</p>
     </div>
 
     <Card class="w-full max-w-2xl mx-auto">
@@ -55,29 +57,27 @@
         <CardContent class="space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-muted-foreground">Country</span>
-            <span class="font-medium flex items-center gap-2">
+            <span class="neon-data flex items-center gap-2">
               <span v-if="getCountryFlag(result.iso_country_code)">{{ getCountryFlag(result.iso_country_code) }}</span>
               {{ result.country || "N/A" }}
             </span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">City</span>
-            <span class="font-medium">{{ result.city || "N/A" }}</span>
+            <span class="neon-data">{{ result.city || "N/A" }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">Continent</span>
-            <span class="font-medium">{{ result.continent || "N/A" }}</span>
+            <span class="neon-data">{{ result.continent || "N/A" }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">Timezone</span>
-            <span class="font-medium">{{ result.timezone || "N/A" }}</span>
+            <span class="neon-data">{{ result.timezone || "N/A" }}</span>
           </div>
           <Separator />
           <div class="flex justify-between">
             <span class="text-muted-foreground">Coordinates</span>
-            <span class="font-medium"
-              >{{ result.latitude }}, {{ result.longitude }}</span
-            >
+            <span class="neon-data">{{ result.latitude }}, {{ result.longitude }}</span>
           </div>
         </CardContent>
       </Card>
@@ -92,15 +92,15 @@
         <CardContent class="space-y-2">
           <div class="flex justify-between">
             <span class="text-muted-foreground">ASN</span>
-            <span class="font-medium">{{ result.asn || "N/A" }}</span>
+            <span class="neon-data">{{ result.asn || "N/A" }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">Organization</span>
-            <span class="font-medium">{{ result.organization || "N/A" }}</span>
+            <span class="neon-data">{{ result.organization || "N/A" }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-muted-foreground">IP Address</span>
-            <span class="font-medium">{{ result.ip }}</span>
+            <span class="neon-data neon-text">{{ result.ip }}</span>
           </div>
         </CardContent>
       </Card>

@@ -3,31 +3,26 @@
     <Card class="w-full max-w-md">
       <CardHeader class="space-y-1 text-center">
         <div class="flex justify-center mb-4">
-          <img src="/logo.png" alt="Waypoint" class="h-20 w-auto" />
+          <img src="/logo.png" alt="Waypoint" class="h-20 w-auto neon-logo" />
         </div>
-        <CardDescription>
-          Sign in to access your IP lookup history and settings
+        <CardDescription class="neon-subheading">
+          // sign in to access your IP lookup history and settings
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
         <div
           v-if="error"
-          class="text-sm text-red-500 text-center p-4 bg-red-50 rounded-md"
+          class="text-sm text-center p-4 rounded-md text-red-500 bg-red-50 dark:bg-neon-pink/10 dark:border dark:border-neon-pink/30 dark:text-neon-pink font-mono"
         >
           {{ error }}
         </div>
-        <div
-          v-else-if="loading"
-          class="text-center text-sm text-muted-foreground py-4"
-        >
-          <div class="flex justify-center items-center gap-2">
-            <div
-              class="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"
-            ></div>
+        <div v-else-if="loading" class="text-center text-sm text-muted-foreground py-4">
+          <div class="flex justify-center items-center gap-2 font-mono dark:text-neon-cyan/70">
+            <div class="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full dark:border-neon-cyan dark:border-t-transparent"></div>
             <span>Redirecting to login...</span>
           </div>
         </div>
-        <Button v-if="!loading" class="w-full" @click="login"> Sign in </Button>
+        <Button v-if="!loading" class="w-full" @click="login">Sign in</Button>
       </CardContent>
     </Card>
   </div>
