@@ -26,7 +26,6 @@ updates:
     assignees:
       - "hibare"
     allow:
-      # Allow only direct updates for
       - dependency-type: "direct"
     groups:
       go:
@@ -45,5 +44,20 @@ updates:
       - "hibare"
     groups:
       docker:
+        patterns:
+          - "*"
+
+  # Maintain dependencies for npm (web frontend)
+  - package-ecosystem: "npm"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "00:30"
+    target-branch: "main"
+    assignees:
+      - "hibare"
+    groups:
+      npm:
         patterns:
           - "*"
