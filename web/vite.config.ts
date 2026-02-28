@@ -29,7 +29,7 @@ export default defineConfig({
           cert: fs.readFileSync(certPath),
         },
         proxy: {
-          "^/api": {
+          "^/api/v1": {
             target: "https://localhost:5000",
             changeOrigin: true,
             secure: false,
@@ -39,7 +39,7 @@ export default defineConfig({
     } else {
       return {
         proxy: {
-          "^/api": {
+          "^/api/v1": {
             target: "http://localhost:5000",
             changeOrigin: true,
             secure: false,
