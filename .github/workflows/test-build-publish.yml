@@ -62,7 +62,7 @@ jobs:
         run: |
           DOCKER_TAGS="unknown"
           VERSION="unknown"
-          IMAGE_NAMES="hibare/waypoint ghcr.io/hibare/waypoint"
+          IMAGE_NAMES="${{ github.repository }} ghcr.io/${{ github.repository }}"
 
           if [ "${{ github.event_name }}" == "push" ]; then
             if [ "${{ github.ref }}" == "refs/heads/main" ]; then
