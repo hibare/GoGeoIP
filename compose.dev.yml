@@ -47,6 +47,25 @@ services:
       retries: 5
       start_period: 10s
 
+  migrate:
+    build:
+      context: .
+      dockerfile: ./local/Dockerfile.backend
+    container_name: migrate
+    hostname: migrate
+    working_dir: /app
+    user: ${HOST_UID}:${HOST_GID}
+    command: db migrate
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    network_mode: host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
   api:
     build:
       context: .
@@ -70,6 +89,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       dex:
         condition: service_healthy
 
