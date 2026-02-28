@@ -25,11 +25,6 @@ var migrateCmd = &cobra.Command{
 		}
 		slog.InfoContext(ctx, "DB tables migrated successfully")
 
-		// if err := dbInstance.RunSQLFromFS(db.ViewsFS, db.ViewsPath); err != nil {
-		// 	return err
-		// }
-
-		// slog.InfoContext(ctx, "DB views created")
 		return nil
 	},
 }

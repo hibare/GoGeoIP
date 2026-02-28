@@ -142,23 +142,14 @@ func (s *Server) Init() error {
 		}
 		fileServer := http.FileServer(http.FS(uiFS))
 		s.router.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-			// We need to clean the path to ensure we look up the file correctly
-			// and remove the leading slash because fs.Sub expects relative paths
 			path := strings.TrimPrefix(r.URL.Path, "/")
 
-			// Check if the file exists in the embedded filesystem
 			if _, err := uiFS.Open(path); err == nil {
-				// Case A: It is a real file (e.g., /assets/logo.png, /favicon.ico)
-				// Serve it normally
 				fileServer.ServeHTTP(w, r)
 				return
 			}
 
-			// Case B: It is NOT a file (404 in FS).
-			// This means it is likely an SPA route (e.g., /dashboard, /login).
-			// We serve index.html so Vue Router can take over.
-
-			// Force the path to root so FileServer serves index.html
+			// SPA route - serve index.html
 			r.URL.Path = "/"
 			fileServer.ServeHTTP(w, r)
 		})
@@ -190,7 +181,6 @@ func (s *Server) serve() error {
 
 	slog.InfoContext(s.ctx, "Starting server", "address", addr)
 
-	// Run our server in a goroutine so that it doesn't block.
 	errChan := make(chan error, 1)
 	go func() {
 		var err error
@@ -207,7 +197,6 @@ func (s *Server) serve() error {
 		}
 	}()
 
-	// Check for immediate errors
 	select {
 	case err := <-errChan:
 		return err
@@ -215,14 +204,10 @@ func (s *Server) serve() error {
 	}
 
 	c := make(chan os.Signal, 1)
-	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
-	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
 	signal.Notify(c, os.Interrupt)
 
-	// Block until we receive our signal.
 	<-c
 
-	// Create a deadline to wait for.
 	ctx, cancel := context.WithTimeout(s.ctx, serverShutdownTimeout)
 	defer cancel()
 

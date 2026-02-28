@@ -284,12 +284,11 @@ func (qb *QueryBuilder) Scope(opts *QueryOptions) func(*gorm.DB) *gorm.DB {
 func sanitizeLikeInput(input any) string {
 	s := fmt.Sprint(input)
 
-	// Remove or escape LIKE wildcards to prevent unintended matching
-	// Note: GORM handles SQL escaping, but we prevent wildcard abuse
+	// Remove LIKE wildcards to prevent unintended matching
 	s = strings.ReplaceAll(s, "%", "")
 	s = strings.ReplaceAll(s, "_", "")
 
-	// Limit input length to prevent DoS
+	// Limit input length
 	if len(s) > MaxInputLength {
 		s = s[:MaxInputLength]
 	}
@@ -297,7 +296,7 @@ func sanitizeLikeInput(input any) string {
 	return s
 }
 
-// -------------------- Operators --------------------.
+// Operators.
 func (qb *QueryBuilder) registerDefaultOperators() {
 	op := func(expr string) OperatorHandler {
 		return func(db *gorm.DB, f string, v any) *gorm.DB {
@@ -347,7 +346,7 @@ func (qb *QueryBuilder) registerDefaultOperators() {
 	}
 }
 
-// -------------------- Field Helpers --------------------.
+// Field Helpers
 
 func (qb *QueryBuilder) RegisterStringField(field string, column ...string) {
 	qb.RegisterField(field, func(v string) (any, error) { return v, nil }, column...)

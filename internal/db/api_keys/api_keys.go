@@ -75,10 +75,8 @@ func (a *APIKey) BeforeCreate(tx *gorm.DB) error {
 
 // GetStatus returns the current status of the API key.
 func (a *APIKey) GetStatus() APIKeyStatus {
-	// First check explicit state field
 	switch a.State {
 	case string(StatusActive):
-		// Even if state is active, check for revocation or expiration
 		if a.RevokedAt != nil {
 			return StatusRevoked
 		}
@@ -91,7 +89,6 @@ func (a *APIKey) GetStatus() APIKeyStatus {
 	case string(StatusExpired):
 		return StatusExpired
 	default:
-		// Fallback to computed status if state is unknown
 		if a.RevokedAt != nil {
 			return StatusRevoked
 		}
@@ -116,7 +113,7 @@ func (a *APIKey) Validate() error {
 	return nil
 }
 
-// generateAPIKey generates a new random API key with axon-api- prefix.
+// generateAPIKey generates a new random API key.
 func generateAPIKey() string {
 	return fmt.Sprintf("%s-api-%s", constants.ProgramIdentifier, uuid.New())
 }
