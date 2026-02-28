@@ -19,7 +19,7 @@ const formattedBuildTimestamp = computed(() => {
       <main class="container mx-auto py-8 px-4 flex-1">
         <RouterView />
       </main>
-      <footer class="border-t py-4 shrink-0 border-neon-cyan/20" style="box-shadow: 0 -1px 12px oklch(0.82 0.18 195 / 10%);">
+      <footer class="border-t py-4 shrink-0 dark:border-neon-cyan/20 footer-glow">
         <div class="container mx-auto px-4 text-center text-xs font-mono">
           <div class="space-y-1">
             <div class="neon-text opacity-50">

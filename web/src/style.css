@@ -257,4 +257,9 @@
     word-break: break-all;
     color: var(--neon-cyan);
   }
+
+  /* --- footer --- */
+  .dark .footer-glow {
+    box-shadow: 0 -1px 12px oklch(0.82 0.18 195 / 10%);
+  }
 }

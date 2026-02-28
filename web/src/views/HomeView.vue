@@ -79,25 +79,6 @@
             <span class="text-muted-foreground">Coordinates</span>
             <span class="neon-data">{{ result.latitude }}, {{ result.longitude }}</span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-muted-foreground">City</span>
-            <span class="font-medium font-mono dark:text-neon-cyan/90">{{ result.city || "N/A" }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-muted-foreground">Continent</span>
-            <span class="font-medium font-mono dark:text-neon-cyan/90">{{ result.continent || "N/A" }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-muted-foreground">Timezone</span>
-            <span class="font-medium font-mono dark:text-neon-cyan/90">{{ result.timezone || "N/A" }}</span>
-          </div>
-          <Separator />
-          <div class="flex justify-between">
-            <span class="text-muted-foreground">Coordinates</span>
-            <span class="font-medium font-mono dark:text-neon-cyan/90"
-              >{{ result.latitude }}, {{ result.longitude }}</span
-            >
-          </div>
         </CardContent>
       </Card>
 
