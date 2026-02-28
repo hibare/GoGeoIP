@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
+	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/spf13/viper"
 )
 
@@ -128,7 +129,7 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	}
 
 	// Environment variable binding.
-	v.SetEnvPrefix("WAYPOINT")
+	v.SetEnvPrefix(strings.ToUpper(constants.ProgramIdentifier))
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	v.AutomaticEnv()
 

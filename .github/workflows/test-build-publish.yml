@@ -62,7 +62,7 @@ jobs:
         run: |
           DOCKER_TAGS="unknown"
           VERSION="unknown"
-          IMAGE_NAMES="hibare/go-geo-ip ghcr.io/hibare/go-geo-ip"
+          IMAGE_NAMES="hibare/waypoint ghcr.io/hibare/waypoint"
 
           if [ "${{ github.event_name }}" == "push" ]; then
             if [ "${{ github.ref }}" == "refs/heads/main" ]; then

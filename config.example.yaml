@@ -52,8 +52,8 @@ db:
   host: 127.0.0.1
   port: 5432
 
-  # Database name (default: tasks)
-  name: tasks
+  # Database name (default: waypoint)
+  name: waypoint
 
   # Connection pool settings (optional)
   # max_idle_conn: 5
