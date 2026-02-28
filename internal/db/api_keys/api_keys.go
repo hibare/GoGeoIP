@@ -2,6 +2,7 @@ package apikeys
 
 import (
 	"context"
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hibare/GoGeoIP/internal/config"
 	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/hibare/GoGeoIP/internal/db"
 	"gorm.io/gorm"
@@ -119,10 +121,11 @@ func generateAPIKey() string {
 	return fmt.Sprintf("%s-api-%s", constants.ProgramIdentifier, uuid.New())
 }
 
-// HashAPIKey creates a SHA-256 hash of the API key for storage.
+// HashAPIKey creates an HMAC-SHA256 hash of the API key for storage.
 func hashAPIKey(apiKey string) string {
-	hash := sha256.Sum256([]byte(apiKey))
-	return base64.StdEncoding.EncodeToString(hash[:])
+	h := hmac.New(sha256.New, []byte(config.Current.Core.SecretKey))
+	h.Write([]byte(apiKey))
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 // CreateAPIKey creates a new API key.
