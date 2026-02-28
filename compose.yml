@@ -1,9 +1,43 @@
 services:
-  api:
-    image: hibare/waypoint
+  postgres:
+    image: postgres:16-alpine
+    container_name: waypoint-postgres
+    hostname: waypoint-postgres
+    environment:
+      - POSTGRES_USER=waypoint
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=waypoint
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waypoint -d waypoint"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  waypoint:
+    image: hibare/waypoint:latest
     container_name: waypoint
     hostname: waypoint
     env_file:
       - .env
     ports:
-      - 5000:5000
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - waypoint_data:/app/data
+
+volumes:
+  postgres_data:
+  waypoint_data:
