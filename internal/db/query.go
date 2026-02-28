@@ -255,11 +255,17 @@ func (qb *QueryBuilder) Scope(opts *QueryOptions) func(*gorm.DB) *gorm.DB {
 			var clauses []string
 			for _, s := range opts.Sort {
 				desc := ""
-				col := s
+				fieldName := s
 				if strings.HasPrefix(s, "-") {
-					col = s[1:]
+					fieldName = s[1:]
 					desc = " DESC"
 				}
+
+				col := fieldName
+				if meta, ok := qb.fields[fieldName]; ok && meta.Column != "" {
+					col = meta.Column
+				}
+
 				clauses = append(clauses, col+desc)
 			}
 			db = db.Order(strings.Join(clauses, ", "))
