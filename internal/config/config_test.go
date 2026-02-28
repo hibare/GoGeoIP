@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +20,8 @@ const (
 	testAPIListenAddr             = "127.0.0.1"
 	testAPIListenPort             = 10000
 	testAPIKeys                   = "test-api-key"
-	testIsDev                     = true
+	testSecretKey                 = "test-secret-key"
+	testDataDir                   = "./data"
 )
 
 func TestEnvLoadedConfig(t *testing.T) {
@@ -32,7 +34,9 @@ func TestEnvLoadedConfig(t *testing.T) {
 	t.Setenv("SERVER_LISTEN_ADDR", testAPIListenAddr)
 	t.Setenv("SERVER_LISTEN_PORT", strconv.Itoa(testAPIListenPort))
 	t.Setenv("API_KEYS", testAPIKeys)
-	t.Setenv("IS_DEV", strconv.FormatBool(testIsDev))
+	t.Setenv("CORE_SECRET_KEY", testSecretKey)
+	t.Setenv("CORE_DATA_DIR", testDataDir)
+	t.Setenv("DB_TYPE", "postgres")
 
 	_, err := Load(ctx, "")
 	require.NoError(t, err)
@@ -46,10 +50,11 @@ func TestEnvLoadedConfig(t *testing.T) {
 	assert.Equal(t, testMaxMindLicenseKey, Current.MaxMind.LicenseKey)
 	assert.Equal(t, testMaxMindAutoUpdate, Current.MaxMind.AutoUpdate)
 	assert.Equal(t, testMaxMindAutoUpdateInterval, Current.MaxMind.AutoUpdateInterval)
-	assert.Equal(t, testIsDev, Current.Server.IsDev)
+	assert.Equal(t, testSecretKey, Current.Core.SecretKey)
+	assert.True(t, strings.HasSuffix(Current.Core.DataDir, "data"))
 
-	// Check asset dir
-	_, err = os.Stat(Current.Server.AssetDirPath)
+	// Check data dir
+	_, err = os.Stat(Current.Core.DataDir)
 	require.NoError(t, err)
 	require.NotErrorIs(t, err, os.ErrNotExist)
 }
@@ -57,18 +62,17 @@ func TestEnvLoadedConfig(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	ctx := context.Background()
 
-	// Unset all env vars except MAXMIND_LICENSE_KEY
-	// Using t.Setenv to empty string to simulate unset for viper (if it treats empty as unset)
-	// OR we can just check errors on Unsetenv.
-	// Since we are fixing lint errors, let's just use t.Setenv to set clean values.
+	// Set minimal env vars
 	t.Setenv("MAXMIND_AUTOUPDATE", "")
 	t.Setenv("MAXMIND_AUTOUPDATE_INTERVAL", "")
 	t.Setenv("SERVER_LISTEN_ADDR", "")
 	t.Setenv("SERVER_LISTEN_PORT", "")
 	t.Setenv("API_KEYS", "")
-	t.Setenv("IS_DEV", "")
+	t.Setenv("CORE_SECRET_KEY", "test-secret-key")
+	t.Setenv("CORE_DATA_DIR", "./data")
 
 	t.Setenv("MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
+	t.Setenv("DB_TYPE", "postgres")
 
 	_, err := Load(ctx, "")
 	require.NoError(t, err)
@@ -82,7 +86,7 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Len(t, Current.Server.APIKeys, 1)
 	assert.True(t, Current.MaxMind.AutoUpdate)
 	assert.Equal(t, DefaultMaxMindAutoUpdateInterval, Current.MaxMind.AutoUpdateInterval)
-	assert.False(t, Current.Server.IsDev)
+	assert.NotEmpty(t, Current.Core.SecretKey)
 }
 
 func TestConfigValidationFail(t *testing.T) {
@@ -95,12 +99,14 @@ func TestConfigValidationFail(t *testing.T) {
 	t.Setenv("SERVER_LISTEN_ADDR", "")
 	t.Setenv("SERVER_LISTEN_PORT", "")
 	t.Setenv("API_KEYS", "")
-	t.Setenv("IS_DEV", "")
+	t.Setenv("CORE_SECRET_KEY", "")
+	t.Setenv("CORE_DATA_DIR", "")
+	t.Setenv("DB_TYPE", "postgres")
 
-	// Load without MAXMIND_LICENSE_KEY should fail
+	// Load without CORE_SECRET_KEY should fail
 	_, err := Load(ctx, "")
 	require.Error(t, err)
-	assert.Equal(t, ErrMaxMindLicenseKeyEmpty, err)
+	assert.Equal(t, ErrSecretKeyEmpty, err)
 }
 
 func TestServerConfigValidation(t *testing.T) {
@@ -112,50 +118,76 @@ func TestServerConfigValidation(t *testing.T) {
 		{
 			name: "valid config",
 			config: ServerConfig{
-				ListenAddr:   "0.0.0.0",
-				ListenPort:   5000,
-				APIKeys:      []string{"test-key"},
-				AssetDirPath: "./data",
+				ListenAddr: "0.0.0.0",
+				ListenPort: 5000,
+				APIKeys:    []string{"test-key"},
 			},
 			expectErr: nil,
 		},
 		{
 			name: "invalid port - too low",
 			config: ServerConfig{
-				ListenAddr:   "0.0.0.0",
-				ListenPort:   0,
-				APIKeys:      []string{"test-key"},
-				AssetDirPath: "./data",
+				ListenAddr: "0.0.0.0",
+				ListenPort: 0,
+				APIKeys:    []string{"test-key"},
 			},
 			expectErr: ErrAPIListenPortInvalid,
 		},
 		{
 			name: "invalid port - too high",
 			config: ServerConfig{
-				ListenAddr:   "0.0.0.0",
-				ListenPort:   70000,
-				APIKeys:      []string{"test-key"},
-				AssetDirPath: "./data",
+				ListenAddr: "0.0.0.0",
+				ListenPort: 70000,
+				APIKeys:    []string{"test-key"},
 			},
 			expectErr: ErrAPIListenPortInvalid,
 		},
 		{
 			name: "empty api keys",
 			config: ServerConfig{
-				ListenAddr:   "0.0.0.0",
-				ListenPort:   5000,
-				APIKeys:      []string{},
-				AssetDirPath: "./data",
+				ListenAddr: "0.0.0.0",
+				ListenPort: 5000,
+				APIKeys:    []string{},
 			},
 			expectErr: ErrAPIKeysEmpty,
 		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.config.Validate()
+			assert.Equal(t, tc.expectErr, err)
+		})
+	}
+}
+
+func TestCoreConfigValidation(t *testing.T) {
+	testCases := []struct {
+		name      string
+		config    CoreConfig
+		expectErr error
+	}{
 		{
-			name: "empty asset dir",
-			config: ServerConfig{
-				ListenAddr:   "0.0.0.0",
-				ListenPort:   5000,
-				APIKeys:      []string{"test-key"},
-				AssetDirPath: "",
+			name: "valid config",
+			config: CoreConfig{
+				SecretKey: "test-secret",
+				DataDir:   "./data",
+			},
+			expectErr: nil,
+		},
+		{
+			name: "empty secret key",
+			config: CoreConfig{
+				SecretKey: "",
+				DataDir:   "./data",
+			},
+			expectErr: ErrSecretKeyEmpty,
+		},
+		{
+			name: "empty data dir",
+			config: CoreConfig{
+				SecretKey: "test-secret",
+				DataDir:   "",
 			},
 			expectErr: ErrAssetDirEmpty,
 		},
@@ -247,12 +279,14 @@ func TestServerConfigGetAddr(t *testing.T) {
 func TestMultipleAPIKeys(t *testing.T) {
 	ctx := context.Background()
 
-	// Unset all env vars
+	// Set minimal env vars
 	t.Setenv("MAXMIND_AUTOUPDATE", "")
 	t.Setenv("MAXMIND_AUTOUPDATE_INTERVAL", "")
 	t.Setenv("SERVER_LISTEN_ADDR", "")
 	t.Setenv("SERVER_LISTEN_PORT", "")
-	t.Setenv("IS_DEV", "")
+	t.Setenv("CORE_SECRET_KEY", "test-secret-key")
+	t.Setenv("CORE_DATA_DIR", "./data")
+	t.Setenv("DB_TYPE", "postgres")
 
 	t.Setenv("MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
 	t.Setenv("API_KEYS", "key1,key2,key3")

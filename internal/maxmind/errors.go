@@ -29,4 +29,7 @@ var (
 
 	// ErrDBOpenFailed is returned when opening a database file fails.
 	ErrDBOpenFailed = errors.New("failed to open database")
+
+	// ErrInvalidIP is returned when an invalid IP address is provided.
+	ErrInvalidIP = errors.New("invalid IP address")
 )

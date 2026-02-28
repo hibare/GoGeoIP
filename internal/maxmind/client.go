@@ -7,18 +7,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/constants"
+	"github.com/hibare/Waypoint/internal/config"
 	"github.com/oschwald/geoip2-golang"
-)
-
-// DBType represents the type of MaxMind database.
-type DBType string
-
-const (
-	DBTypeCountry DBType = constants.DBTypeCountry
-	DBTypeCity    DBType = constants.DBTypeCity
-	DBTypeASN     DBType = constants.DBTypeASN
 )
 
 // Client handles MaxMind database operations and lookups.

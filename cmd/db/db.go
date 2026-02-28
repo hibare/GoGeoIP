@@ -1,15 +1,13 @@
 package db
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 var DBCmd = &cobra.Command{
 	Use:   "db",
-	Short: "IP DB related commands",
-	Long:  "",
+	Short: "Database management commands",
+	Long:  "Manage database operations including migrations and schema management for Waypoint.",
 }
 
 func init() {
-	DBCmd.AddCommand(dBDownloadCmd)
+	DBCmd.AddCommand(migrateCmd)
 }

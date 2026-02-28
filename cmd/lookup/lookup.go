@@ -4,21 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hibare/GoGeoIP/internal/config"
-	"github.com/hibare/GoGeoIP/internal/maxmind"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/maxmind"
 	"github.com/spf13/cobra"
 )
 
 var LookupCmd = &cobra.Command{
-	Use:     "lookup <ip>",
-	Short:   "Lookup Geo information for an IP",
-	Long:    "Lookup geographic information for a given IP address using MaxMind GeoIP databases",
-	Args:    cobra.ExactArgs(1),
-	Aliases: []string{"gogeoip"},
+	Use:   "lookup <ip>",
+	Short: "Lookup IP geolocation information",
+	Long:  "Lookup geographic information for a given IP address using MaxMind GeoIP databases. Supports both IPv4 and IPv6 addresses.",
+	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ip := args[0]
 
-		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Server.AssetDirPath)
+		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Core.DataDir)
 		if err := mmClient.Load(); err != nil {
 			return fmt.Errorf("failed to load MaxMind databases: %w", err)
 		}

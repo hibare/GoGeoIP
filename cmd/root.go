@@ -1,28 +1,30 @@
 package cmd
 
 import (
-	"log/slog"
 	"os"
 
-	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
-	"github.com/hibare/GoGeoIP/cmd/db"
-	"github.com/hibare/GoGeoIP/cmd/lookup"
-	"github.com/hibare/GoGeoIP/cmd/server"
-	"github.com/hibare/GoGeoIP/internal/config"
+	"github.com/hibare/Waypoint/cmd/db"
+	"github.com/hibare/Waypoint/cmd/lookup"
+	"github.com/hibare/Waypoint/cmd/maxmind"
+	"github.com/hibare/Waypoint/cmd/server"
+	"github.com/hibare/Waypoint/internal/config"
+	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/spf13/cobra"
 )
-
-var Version = "0.0.0"
 
 var (
 	ConfigPath string
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "go_geo_ip",
-	Short:   "API to fetch Geo information for an IP",
-	Long:    "",
-	Version: Version,
+	Use:     "waypoint",
+	Short:   "IP Geo location Service",
+	Long:    "Waypoint is an IP geo location service that provides geographic information for any IP address using MaxMind GeoIP databases.",
+	Version: constants.Version,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		_, err := config.Load(cmd.Context(), ConfigPath)
+		return err
+	},
 }
 
 func Execute() {
@@ -38,15 +40,7 @@ func init() {
 
 	// Add subcommands
 	rootCmd.AddCommand(db.DBCmd)
+	rootCmd.AddCommand(maxmind.MaxmindCmd)
 	rootCmd.AddCommand(lookup.LookupCmd)
 	rootCmd.AddCommand(server.ServeCmd)
-
-	// Load config with context
-	ctx := rootCmd.Context()
-	if _, err := config.Load(ctx, ConfigPath); err != nil {
-		slog.Error("Failed to load config", "error", err)
-		os.Exit(1)
-	}
-
-	cobra.OnInitialize(commonLogger.InitDefaultLogger)
 }

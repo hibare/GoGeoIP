@@ -1,0 +1,109 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    hostname: postgres
+    environment:
+      - POSTGRES_USER=john
+      - POSTGRES_PASSWORD=pwd0123456789
+      - POSTGRES_DB=tasks
+    network_mode: host
+    volumes:
+      - ./.volumes/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U john -d tasks'"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    hostname: adminer
+    network_mode: host
+    healthcheck:
+      test: "curl -f localhost:8080 || false"
+      interval: 30s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  dex:
+    image: dexidp/dex:latest
+    container_name: dex
+    hostname: dex
+    network_mode: host
+    volumes:
+      - ./local/dex-config.yaml:/etc/dex/config.docker.yaml:ro
+    command: ["dex", "serve", "/etc/dex/config.docker.yaml"]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 5556 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  migrate:
+    build:
+      context: .
+      dockerfile: ./local/Dockerfile.backend
+    container_name: migrate
+    hostname: migrate
+    working_dir: /app
+    user: ${HOST_UID}:${HOST_GID}
+    command: db migrate
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    network_mode: host
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: ./local/Dockerfile.backend
+    container_name: api
+    hostname: api
+    working_dir: /app
+    user: ${HOST_UID}:${HOST_GID}
+    command: -c air.toml
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -k https://localhost:5000/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      dex:
+        condition: service_healthy
+
+  ui:
+    build:
+      context: ./web
+      dockerfile: ../local/Dockerfile.ui
+    container_name: ui
+    hostname: ui
+    working_dir: /app
+    network_mode: host
+    user: "${HOST_UID}:${HOST_GID}"
+    volumes:
+      - ./web:/app
+      - ./certs:/certs
+    depends_on:
+      api:
+        condition: service_healthy

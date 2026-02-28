@@ -3,7 +3,6 @@ package maxmind
 import (
 	"net"
 
-	"github.com/hibare/GoGeoIP/internal/constants"
 	"github.com/oschwald/geoip2-golang"
 )
 
@@ -49,7 +48,7 @@ func (c *Client) IP2Country(ipStr string) (IPCountry, error) {
 
 	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
-		return ipCountry, constants.ErrInvalidIP
+		return ipCountry, ErrInvalidIP
 	}
 
 	record, err := c.Country(parsedIP)
@@ -74,7 +73,7 @@ func (c *Client) IP2City(ipStr string) (IPCity, error) {
 
 	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
-		return ipCity, constants.ErrInvalidIP
+		return ipCity, ErrInvalidIP
 	}
 
 	record, err := c.City(parsedIP)
@@ -103,7 +102,7 @@ func (c *Client) IP2ASN(ipStr string) (IPASN, error) {
 
 	parsedIP := net.ParseIP(ipStr)
 	if parsedIP == nil {
-		return ipAsn, constants.ErrInvalidIP
+		return ipAsn, ErrInvalidIP
 	}
 
 	record, err := c.ASN(parsedIP)
