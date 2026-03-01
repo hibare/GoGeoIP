@@ -1,16 +1,46 @@
 ARG GOLANG_VERSION=1.26.0
+ARG VERSION=unknown
+ARG BUILD_TIMESTAMP=unknown
+ARG COMMIT_HASH=unknown
 
-FROM golang:${GOLANG_VERSION}-alpine AS base
+# ================== Build Frontend ================== #
+FROM node:25-alpine AS frontend-build
+
+ARG VERSION
+ARG BUILD_TIMESTAMP
+ARG COMMIT_HASH
+
+WORKDIR /app
+
+COPY web/package.json web/pnpm-lock.yaml* ./
+
+# hadolint ignore=DL3016
+RUN npm install -g pnpm \
+	&& pnpm install --frozen-lockfile
+
+COPY web/ ./
+
+ENV NODE_ENV=production
+ENV VITE_VERSION=$VERSION
+ENV VITE_BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV VITE_COMMIT_HASH=$COMMIT_HASH
+
+RUN pnpm run build
 
 # ================== Build App ================== #
-FROM base AS build
 
-# prefer ash on Alpine so -o pipefail behaves as expected
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+FROM golang:${GOLANG_VERSION}-alpine AS build
+
+ARG VERSION
+ARG BUILD_TIMESTAMP
+ARG COMMIT_HASH
 
 ARG VERSION=unknown
 ARG BUILD_TIMESTAMP=unknown
 ARG COMMIT_HASH=unknown
+
+# prefer ash on Alpine so -o pipefail behaves as expected
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 # Install healthcheck cmd
 # hadolint ignore=DL3018
@@ -23,34 +53,15 @@ WORKDIR /src/
 
 COPY . /src/
 
+# Copy built frontend into backend source for embedding
+COPY --from=frontend-build /app/dist ./cmd/server/static
+
 # hadolint ignore=DL3018
-RUN apk --no-cache add ca-certificates \
-    && CGO_ENABLED=0 go build -ldflags "-X github.com/hibare/Waypoint/internal/constants.Version=$VERSION -X github.com/hibare/Waypoint/internal/constants.BuildTimestamp=$BUILD_TIMESTAMP -X github.com/hibare/Waypoint/internal/constants.CommitHash=$COMMIT_HASH" -o /bin/waypoint ./main.go
-
-# ================== Build Frontend ================== #
-FROM node:25-alpine AS frontend-build
-
-WORKDIR /app
-
-ARG VERSION=unknown
-ARG BUILD_TIMESTAMP=unknown
-ARG COMMIT_HASH=unknown
-
-ENV VITE_VERSION=$VERSION
-ENV VITE_BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-ENV VITE_COMMIT_HASH=$COMMIT_HASH
-
-COPY web/package.json web/pnpm-lock.yaml* ./
-
-# hadolint ignore=DL3016
-RUN npm install -g pnpm && pnpm install
-
-COPY web/ ./
-RUN pnpm run build
+RUN CGO_ENABLED=0 go build -ldflags "-X github.com/hibare/Waypoint/internal/constants.Version=$VERSION -X github.com/hibare/Waypoint/internal/constants.BuildTimestamp=$BUILD_TIMESTAMP -X github.com/hibare/Waypoint/internal/constants.CommitHash=$COMMIT_HASH" -o /bin/waypoint ./main.go
 
 # ================== Build Final Image ================== #
 # hadolint ignore=DL3006
-FROM alpine
+FROM alpine:3.23@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
 
 # ensure consistent shell in final stage too
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
@@ -62,8 +73,6 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /bin/waypoint /bin/waypoint
 
 COPY --from=build /usr/local/bin/healthcheck /bin/healthcheck
-
-COPY --from=frontend-build /app/dist /app/dist
 
 HEALTHCHECK \
     --interval=30s \
