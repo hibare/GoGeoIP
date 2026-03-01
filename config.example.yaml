@@ -39,21 +39,13 @@ server:
   api_keys: "key1,key2,key3"
 
 # Database configuration (optional)
-# Leave empty for in-memory storage
+# Leave empty to disable database features
 db:
-  # Database type: postgres
-  type: postgres
-
-  # Database credentials
-  username: ""
-  password: ""
-
-  # Database host and port (default: 127.0.0.1:5432)
-  host: 127.0.0.1
-  port: 5432
-
-  # Database name (default: waypoint)
-  name: waypoint
+  # Database connection string
+  # Examples:
+  #   postgres://user:password@127.0.0.1:5432/waypoint?sslmode=disable
+  #   postgres://user:password@127.0.0.1:5432/waypoint?sslmode=require
+  dsn: ""
 
   # Connection pool settings (optional)
   # max_idle_conn: 5

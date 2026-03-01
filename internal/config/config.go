@@ -78,13 +78,6 @@ type Config struct {
 
 // Validate validates the entire configuration.
 func (c *Config) Validate() error {
-	// Skip DB validation if not configured
-	if c.DB.DBType != "" {
-		if err := c.DB.Validate(); err != nil {
-			return err
-		}
-	}
-
 	// Skip OIDC validation if not configured
 	if c.OIDC.IssuerURL != "" {
 		if err := c.OIDC.Validate(); err != nil {
@@ -93,6 +86,7 @@ func (c *Config) Validate() error {
 	}
 
 	var vFuncs = []func() error{
+		c.DB.Validate,
 		c.Core.Validate,
 		c.MaxMind.Validate,
 		c.Server.Validate,
@@ -138,11 +132,7 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 		"core.environment":             "CORE_ENVIRONMENT",
 		"core.secret_key":              "CORE_SECRET_KEY",
 		"core.data_dir":                "CORE_DATA_DIR",
-		"db.username":                  "DB_USERNAME",
-		"db.password":                  "DB_PASSWORD",
-		"db.host":                      "DB_HOST",
-		"db.port":                      "DB_PORT",
-		"db.name":                      "DB_NAME",
+		"db.dsn":                       "DB_DSN",
 		"db.max_idle_conn":             "DB_MAX_IDLE_CONN",
 		"db.max_open_conn":             "DB_MAX_OPEN_CONN",
 		"db.conn_max_lifetime":         "DB_CONN_MAX_LIFETIME",
@@ -179,9 +169,6 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	// Set default values.
 	v.SetDefault("core.environment", EnvironmentProduction)
 	v.SetDefault("core.data_dir", DefaultAssetDirPath)
-	v.SetDefault("db.host", DefaultDBHost)
-	v.SetDefault("db.port", DefaultDBPort)
-	v.SetDefault("db.name", DefaultDBName)
 	v.SetDefault("db.max_idle_conn", DefaultDBMaxIdleConn)
 	v.SetDefault("db.max_open_conn", DefaultDBMaxOpenConn)
 	v.SetDefault("db.conn_max_lifetime", DefaultDBConnMaxLifetime)

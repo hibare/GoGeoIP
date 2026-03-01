@@ -22,6 +22,7 @@ const (
 	testAPIKeys                   = "test-api-key"
 	testSecretKey                 = "test-secret-key"
 	testDataDir                   = "./data"
+	testDBDSN                     = "postgres://user:testpwd@localhost:5432/waypoint?sslmode=disable" //nolint:gosec // test DSN with dummy credentials
 )
 
 func TestEnvLoadedConfig(t *testing.T) {
@@ -36,7 +37,7 @@ func TestEnvLoadedConfig(t *testing.T) {
 	t.Setenv("API_KEYS", testAPIKeys)
 	t.Setenv("CORE_SECRET_KEY", testSecretKey)
 	t.Setenv("CORE_DATA_DIR", testDataDir)
-	t.Setenv("DB_TYPE", "postgres")
+	t.Setenv("DB_DSN", testDBDSN)
 
 	_, err := Load(ctx, "")
 	require.NoError(t, err)
@@ -70,9 +71,8 @@ func TestDefaultConfig(t *testing.T) {
 	t.Setenv("API_KEYS", "")
 	t.Setenv("CORE_SECRET_KEY", "test-secret-key")
 	t.Setenv("CORE_DATA_DIR", "./data")
-
 	t.Setenv("MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
-	t.Setenv("DB_TYPE", "postgres")
+	t.Setenv("DB_DSN", testDBDSN)
 
 	_, err := Load(ctx, "")
 	require.NoError(t, err)
@@ -101,7 +101,7 @@ func TestConfigValidationFail(t *testing.T) {
 	t.Setenv("API_KEYS", "")
 	t.Setenv("CORE_SECRET_KEY", "")
 	t.Setenv("CORE_DATA_DIR", "")
-	t.Setenv("DB_TYPE", "postgres")
+	t.Setenv("DB_DSN", testDBDSN)
 
 	// Load without CORE_SECRET_KEY should fail
 	_, err := Load(ctx, "")
@@ -286,9 +286,8 @@ func TestMultipleAPIKeys(t *testing.T) {
 	t.Setenv("SERVER_LISTEN_PORT", "")
 	t.Setenv("CORE_SECRET_KEY", "test-secret-key")
 	t.Setenv("CORE_DATA_DIR", "./data")
-	t.Setenv("DB_TYPE", "postgres")
-
 	t.Setenv("MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
+	t.Setenv("DB_DSN", testDBDSN)
 	t.Setenv("API_KEYS", "key1,key2,key3")
 
 	_, err := Load(ctx, "")
