@@ -3,6 +3,7 @@ package maxmind
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -67,11 +68,11 @@ func (c *Client) downloadDB(ctx context.Context, dbType DBType) error {
 		return ErrLicenseKeyRequired
 	}
 
-	tmpDir := filepath.Join(c.dataDir, "tmp")
-	if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(c.dataDir, os.ModePerm); err != nil {
 		return err
 	}
 
+	tmpDir := os.TempDir()
 	archivePath := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBArchiveDownloadSuffix))
 	sha256Path := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBSHA256FileDownloadSuffix))
 
@@ -117,14 +118,29 @@ func (c *Client) downloadDB(ctx context.Context, dbType DBType) error {
 		return err
 	}
 
-	slog.Info("Loading new DB file", "path", finalDBPath)
-	_ = os.Remove(finalDBPath) // Remove old DB file
-
-	if err := os.Rename(extractedPath, finalDBPath); err != nil {
+	tmpPath := finalDBPath + ".tmp"
+	if err := copyFile(extractedPath, tmpPath); err != nil {
 		return err
 	}
+	_ = os.Remove(extractedPath)
+	return os.Rename(tmpPath, finalDBPath)
+}
 
-	return nil
+func copyFile(src, dst string) error {
+	fsrc, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = fsrc.Close() }()
+
+	fdst, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = fdst.Close() }()
+
+	_, err = io.Copy(fdst, fsrc)
+	return err
 }
 
 func (c *Client) parseSHA256File(path string) (string, string, error) {
