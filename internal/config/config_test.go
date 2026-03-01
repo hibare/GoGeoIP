@@ -34,7 +34,6 @@ func TestEnvLoadedConfig(t *testing.T) {
 	t.Setenv("WAYPOINT_MAXMIND_AUTO_UPDATE_INTERVAL", testMaxMindAutoUpdateInterval.String())
 	t.Setenv("WAYPOINT_SERVER_LISTEN_ADDR", testAPIListenAddr)
 	t.Setenv("WAYPOINT_SERVER_LISTEN_PORT", strconv.Itoa(testAPIListenPort))
-	t.Setenv("WAYPOINT_SERVER_API_KEYS", testAPIKeys)
 	t.Setenv("WAYPOINT_CORE_SECRET_KEY", testSecretKey)
 	t.Setenv("WAYPOINT_CORE_DATA_DIR", testDataDir)
 	t.Setenv("WAYPOINT_DB_DSN", testDBDSN)
@@ -47,7 +46,6 @@ func TestEnvLoadedConfig(t *testing.T) {
 
 	assert.Equal(t, testAPIListenAddr, Current.Server.ListenAddr)
 	assert.Equal(t, testAPIListenPort, Current.Server.ListenPort)
-	assert.Equal(t, []string{testAPIKeys}, Current.Server.APIKeys)
 	assert.Equal(t, testMaxMindLicenseKey, Current.MaxMind.LicenseKey)
 	assert.Equal(t, testMaxMindAutoUpdate, Current.MaxMind.AutoUpdate)
 	assert.Equal(t, testMaxMindAutoUpdateInterval, Current.MaxMind.AutoUpdateInterval)
@@ -68,7 +66,6 @@ func TestDefaultConfig(t *testing.T) {
 	t.Setenv("WAYPOINT_MAXMIND_AUTO_UPDATE_INTERVAL", "")
 	t.Setenv("WAYPOINT_SERVER_LISTEN_ADDR", "")
 	t.Setenv("WAYPOINT_SERVER_LISTEN_PORT", "")
-	t.Setenv("WAYPOINT_SERVER_API_KEYS", "")
 	t.Setenv("WAYPOINT_CORE_SECRET_KEY", "test-secret-key")
 	t.Setenv("WAYPOINT_CORE_DATA_DIR", "./data")
 	t.Setenv("WAYPOINT_MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
@@ -82,8 +79,6 @@ func TestDefaultConfig(t *testing.T) {
 
 	assert.Equal(t, DefaultServerListenAddr, Current.Server.ListenAddr)
 	assert.Equal(t, DefaultServerListenPort, Current.Server.ListenPort)
-	assert.NotEmpty(t, Current.Server.APIKeys)
-	assert.Len(t, Current.Server.APIKeys, 1)
 	assert.True(t, Current.MaxMind.AutoUpdate)
 	assert.Equal(t, DefaultMaxMindAutoUpdateInterval, Current.MaxMind.AutoUpdateInterval)
 	assert.NotEmpty(t, Current.Core.SecretKey)
@@ -98,7 +93,6 @@ func TestConfigValidationFail(t *testing.T) {
 	t.Setenv("WAYPOINT_MAXMIND_AUTO_UPDATE_INTERVAL", "")
 	t.Setenv("WAYPOINT_SERVER_LISTEN_ADDR", "")
 	t.Setenv("WAYPOINT_SERVER_LISTEN_PORT", "")
-	t.Setenv("WAYPOINT_SERVER_API_KEYS", "")
 	t.Setenv("WAYPOINT_CORE_SECRET_KEY", "")
 	t.Setenv("WAYPOINT_CORE_DATA_DIR", "")
 	t.Setenv("WAYPOINT_DB_DSN", testDBDSN)
@@ -120,7 +114,6 @@ func TestServerConfigValidation(t *testing.T) {
 			config: ServerConfig{
 				ListenAddr: "0.0.0.0",
 				ListenPort: 5000,
-				APIKeys:    []string{"test-key"},
 			},
 			expectErr: nil,
 		},
@@ -129,7 +122,6 @@ func TestServerConfigValidation(t *testing.T) {
 			config: ServerConfig{
 				ListenAddr: "0.0.0.0",
 				ListenPort: 0,
-				APIKeys:    []string{"test-key"},
 			},
 			expectErr: ErrAPIListenPortInvalid,
 		},
@@ -138,18 +130,8 @@ func TestServerConfigValidation(t *testing.T) {
 			config: ServerConfig{
 				ListenAddr: "0.0.0.0",
 				ListenPort: 70000,
-				APIKeys:    []string{"test-key"},
 			},
 			expectErr: ErrAPIListenPortInvalid,
-		},
-		{
-			name: "empty api keys",
-			config: ServerConfig{
-				ListenAddr: "0.0.0.0",
-				ListenPort: 5000,
-				APIKeys:    []string{},
-			},
-			expectErr: ErrAPIKeysEmpty,
 		},
 	}
 
@@ -274,27 +256,4 @@ func TestServerConfigGetAddr(t *testing.T) {
 			assert.Equal(t, tc.expected, addr)
 		})
 	}
-}
-
-func TestMultipleAPIKeys(t *testing.T) {
-	ctx := context.Background()
-
-	// Set minimal env vars
-	t.Setenv("WAYPOINT_MAXMIND_AUTO_UPDATE", "")
-	t.Setenv("WAYPOINT_MAXMIND_AUTO_UPDATE_INTERVAL", "")
-	t.Setenv("WAYPOINT_SERVER_LISTEN_ADDR", "")
-	t.Setenv("WAYPOINT_SERVER_LISTEN_PORT", "")
-	t.Setenv("WAYPOINT_CORE_SECRET_KEY", "test-secret-key")
-	t.Setenv("WAYPOINT_CORE_DATA_DIR", "./data")
-	t.Setenv("WAYPOINT_MAXMIND_LICENSE_KEY", testMaxMindLicenseKey)
-	t.Setenv("WAYPOINT_DB_DSN", testDBDSN)
-	t.Setenv("WAYPOINT_SERVER_API_KEYS", "key1,key2,key3")
-
-	_, err := Load(ctx, "")
-	require.NoError(t, err)
-	defer func() {
-		_ = os.RemoveAll(constants.AssetDir)
-	}()
-
-	assert.Equal(t, []string{"key1", "key2", "key3"}, Current.Server.APIKeys)
 }

@@ -9,9 +9,6 @@ import (
 )
 
 var (
-	// ErrAPIKeysEmpty indicates that no API keys were provided.
-	ErrAPIKeysEmpty = errors.New("at least one API key is required")
-
 	//  ErrInvalidPort indicates that the server port is invalid.
 	ErrInvalidPort = errors.New("invalid server port. Port must be between 1 and 65535")
 
@@ -60,7 +57,6 @@ type ServerConfig struct {
 	RequestTimeout time.Duration `mapstructure:"request_timeout"`
 	CertFile       string        `mapstructure:"cert_file"`
 	KeyFile        string        `mapstructure:"key_file"`
-	APIKeys        []string      `mapstructure:"api_keys"` //nolint:gosec // list of valid API keys for authentication
 }
 
 // GetAddr returns the API server's listen address in "host:port" format.
@@ -77,10 +73,6 @@ func (s *ServerConfig) PostProcess() {
 func (s *ServerConfig) Validate() error {
 	if s.ListenPort <= 0 || s.ListenPort > 65535 {
 		return ErrInvalidPort
-	}
-
-	if len(s.APIKeys) == 0 {
-		return ErrAPIKeysEmpty
 	}
 
 	if s.BaseURL != "" {

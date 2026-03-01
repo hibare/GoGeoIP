@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/google/uuid"
 	commonLogger "github.com/hibare/GoCommon/v2/pkg/logger"
 	"github.com/hibare/Waypoint/internal/constants"
 	"github.com/spf13/viper"
@@ -148,7 +147,6 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 		"server.request_timeout",
 		"server.cert_file",
 		"server.key_file",
-		"server.api_keys",
 		"logger.level",
 		"logger.mode",
 		"maxmind.license_key",
@@ -181,7 +179,6 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	v.SetDefault("server.idle_timeout", DefaultServerIdleTimeout)
 	v.SetDefault("server.wait_timeout", DefaultServerWaitTimeout)
 	v.SetDefault("server.request_timeout", DefaultServerRequestTimeout)
-	v.SetDefault("server.api_keys", []string{uuid.New().String()})
 	v.SetDefault("logger.level", commonLogger.LogLevelInfo)
 	v.SetDefault("logger.mode", commonLogger.LogModePretty)
 	v.SetDefault("maxmind.license_key", "")
@@ -217,18 +214,6 @@ func Load(ctx context.Context, configPath string) (*Config, error) {
 	// Unmarshal into config.
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
-	}
-
-	// Handle comma-separated API keys from environment variable
-	if apiKeysStr := v.GetString("server.api_keys"); apiKeysStr != "" {
-		// If it's a comma-separated string, split it
-		if strings.Contains(apiKeysStr, ",") {
-			keys := strings.Split(apiKeysStr, ",")
-			for i, key := range keys {
-				keys[i] = strings.TrimSpace(key)
-			}
-			cfg.Server.APIKeys = keys
-		}
 	}
 
 	if err := cfg.Validate(); err != nil {

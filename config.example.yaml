@@ -36,7 +36,6 @@ server:
   # key_file: /path/to/key.pem
 
   # API keys for authentication (comma-separated)
-  api_keys: "key1,key2,key3"
 
 # Database configuration (optional)
 # Leave empty to disable database features
