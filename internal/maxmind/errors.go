@@ -13,7 +13,7 @@ var (
 	ErrASNDBNotLoaded = errors.New("ASN database not loaded")
 
 	// ErrLicenseKeyRequired is returned when the MaxMind license key is missing.
-	ErrLicenseKeyRequired = errors.New("MAXMIND_LICENSE_KEY is required")
+	ErrLicenseKeyRequired = errors.New("WAYPOINT_MAXMIND_LICENSE_KEY is required")
 
 	// ErrChecksumMismatch is returned when the downloaded file checksum does not match.
 	ErrChecksumMismatch = errors.New("checksum mismatch")

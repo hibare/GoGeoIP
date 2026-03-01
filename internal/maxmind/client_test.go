@@ -14,9 +14,9 @@ import (
 
 func TestClient_DownloadAndLoad(t *testing.T) {
 	// Skip if no license key provided (integration test)
-	licenseKey := os.Getenv("MAXMIND_LICENSE_KEY")
+	licenseKey := os.Getenv("WAYPOINT_MAXMIND_LICENSE_KEY")
 	if licenseKey == "" {
-		t.Skip("MAXMIND_LICENSE_KEY not set, skipping integration test")
+		t.Skip("WAYPOINT_MAXMIND_LICENSE_KEY not set, skipping integration test")
 	}
 
 	// Create temp dir for data

@@ -128,40 +128,41 @@ func (c *Config) getViper(ctx context.Context, configPath string) *viper.Viper {
 	v.AutomaticEnv()
 
 	// Environment variable bindings.
-	envBindings := map[string]string{ //nolint:gosec // mapping config keys to env vars, not actual secrets
-		"core.environment":             "CORE_ENVIRONMENT",
-		"core.secret_key":              "CORE_SECRET_KEY",
-		"core.data_dir":                "CORE_DATA_DIR",
-		"db.dsn":                       "DB_DSN",
-		"db.max_idle_conn":             "DB_MAX_IDLE_CONN",
-		"db.max_open_conn":             "DB_MAX_OPEN_CONN",
-		"db.conn_max_lifetime":         "DB_CONN_MAX_LIFETIME",
-		"server.listen_addr":           "SERVER_LISTEN_ADDR",
-		"server.listen_port":           "SERVER_LISTEN_PORT",
-		"server.base_url":              "SERVER_BASE_URL",
-		"server.write_timeout":         "SERVER_WRITE_TIMEOUT",
-		"server.read_timeout":          "SERVER_READ_TIMEOUT",
-		"server.idle_timeout":          "SERVER_IDLE_TIMEOUT",
-		"server.wait_timeout":          "SERVER_WAIT_TIMEOUT",
-		"server.request_timeout":       "SERVER_REQUEST_TIMEOUT",
-		"server.cert_file":             "SERVER_CERT_FILE",
-		"server.key_file":              "SERVER_KEY_FILE",
-		"server.api_keys":              "API_KEYS",
-		"logger.level":                 "LOG_LEVEL",
-		"logger.mode":                  "LOG_MODE",
-		"maxmind.license_key":          "MAXMIND_LICENSE_KEY",
-		"maxmind.auto_update":          "MAXMIND_AUTOUPDATE",
-		"maxmind.auto_update_interval": "MAXMIND_AUTOUPDATE_INTERVAL",
-		"oidc.issuer_url":              "OIDC_ISSUER_URL",
-		"oidc.client_id":               "OIDC_CLIENT_ID",
-		"oidc.client_secret":           "OIDC_CLIENT_SECRET",
+	// With SetEnvPrefix("WAYPOINT") + SetEnvKeyReplacer("."→"_") + AutomaticEnv(),
+	// each key maps to WAYPOINT_<UPPER_KEY> automatically (e.g. core.secret_key → WAYPOINT_CORE_SECRET_KEY).
+	envKeys := []string{
+		"core.environment",
+		"core.secret_key",
+		"core.data_dir",
+		"db.dsn",
+		"db.max_idle_conn",
+		"db.max_open_conn",
+		"db.conn_max_lifetime",
+		"server.listen_addr",
+		"server.listen_port",
+		"server.base_url",
+		"server.write_timeout",
+		"server.read_timeout",
+		"server.idle_timeout",
+		"server.wait_timeout",
+		"server.request_timeout",
+		"server.cert_file",
+		"server.key_file",
+		"server.api_keys",
+		"logger.level",
+		"logger.mode",
+		"maxmind.license_key",
+		"maxmind.auto_update",
+		"maxmind.auto_update_interval",
+		"oidc.issuer_url",
+		"oidc.client_id",
+		"oidc.client_secret",
 	}
 
-	for key, envVar := range envBindings {
-		if err := v.BindEnv(key, envVar); err != nil {
+	for _, key := range envKeys {
+		if err := v.BindEnv(key); err != nil {
 			slog.WarnContext(ctx, "Failed to bind environment variable",
 				slog.String("config", key),
-				slog.String("env", envVar),
 				slog.String("error", err.Error()))
 		}
 	}
