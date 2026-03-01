@@ -27,4 +27,5 @@ var migrateCmd = &cobra.Command{
 
 		return nil
 	},
+	SilenceUsage: true,
 }

@@ -222,10 +222,11 @@ func (s *Server) serve() error {
 
 // ServeCmd represents the server command.
 var ServeCmd = &cobra.Command{
-	Use:     "serve",
-	Short:   "Start the API server",
-	Long:    "Start the Waypoint API server. The server provides IP geolocation endpoints and optionally serves the web UI.",
-	Aliases: []string{"server", "run"},
+	Use:          "serve",
+	Short:        "Start the API server",
+	Long:         "Start the Waypoint API server. The server provides IP geolocation endpoints and optionally serves the web UI.",
+	Aliases:      []string{"server", "run"},
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 

@@ -5,9 +5,10 @@ import (
 )
 
 var MaxmindCmd = &cobra.Command{
-	Use:   "maxmind",
-	Short: "MaxMind database management",
-	Long:  "Manage MaxMind GeoIP databases including downloading and updating database files.",
+	Use:          "maxmind",
+	Short:        "MaxMind database management",
+	Long:         "Manage MaxMind GeoIP databases including downloading and updating database files.",
+	SilenceUsage: true,
 }
 
 func init() {

@@ -67,11 +67,11 @@ func (c *Client) downloadDB(ctx context.Context, dbType DBType) error {
 		return ErrLicenseKeyRequired
 	}
 
-	if err := os.MkdirAll(c.dataDir, os.ModePerm); err != nil {
+	tmpDir := filepath.Join(c.dataDir, "tmp")
+	if err := os.MkdirAll(tmpDir, os.ModePerm); err != nil {
 		return err
 	}
 
-	tmpDir := os.TempDir()
 	archivePath := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBArchiveDownloadSuffix))
 	sha256Path := filepath.Join(tmpDir, fmt.Sprintf("%s.%s", dbType, DBSHA256FileDownloadSuffix))
 

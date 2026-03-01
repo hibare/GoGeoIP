@@ -14,4 +14,5 @@ var downloadCmd = &cobra.Command{
 		mmClient := maxmind.NewClient(&config.Current.MaxMind, config.Current.Core.DataDir)
 		return mmClient.DownloadAllDB()
 	},
+	SilenceUsage: true,
 }

@@ -35,4 +35,5 @@ var LookupCmd = &cobra.Command{
 		cmd.Println(string(b))
 		return nil
 	},
+	SilenceUsage: true,
 }
