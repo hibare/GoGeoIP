@@ -106,8 +106,8 @@ func tryAPIKeyAuth(ctx context.Context, db *gorm.DB, authHeader string) *auth.Us
 		return nil
 	}
 
-	// Update last used async (use background context to avoid cancellation)
-	go func() { _ = apikeys.UpdateAPIKeyLastUsed(context.Background(), db, key.ID) }()
+	// Update last used async (use WithoutCancel to avoid cancellation)
+	go func() { _ = apikeys.UpdateAPIKeyLastUsed(context.WithoutCancel(ctx), db, key.ID) }()
 
 	return &auth.UserJWTClaims{
 		UserID:     user.ID.String(),

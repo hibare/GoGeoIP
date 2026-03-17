@@ -33,7 +33,7 @@ const (
 type OIDCConfig struct {
 	IssuerURL    string   `mapstructure:"issuer_url"`
 	ClientID     string   `mapstructure:"client_id"`
-	ClientSecret string   `mapstructure:"client_secret"` //nolint:gosec // required for OIDC authentication
+	ClientSecret string   `mapstructure:"client_secret"`
 	Scopes       []string `mapstructure:"scopes"`
 }
 
