@@ -10,7 +10,7 @@ require (
 	github.com/go-chi/render v1.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
-	github.com/hibare/GoCommon/v2 v2.30.0
+	github.com/hibare/GoCommon/v2 v2.31.0
 	github.com/oschwald/geoip2-golang v1.13.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
