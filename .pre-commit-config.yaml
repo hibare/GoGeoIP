@@ -57,7 +57,3 @@ repos:
         language: system
         pass_filenames: false
         files: ^web/
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.38.0
-    hooks:
-      - id: eslint
